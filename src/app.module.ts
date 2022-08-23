@@ -12,7 +12,10 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: (process.env.NODE_ENV ?? 'development') + '.env',
+      envFilePath:
+        process.env.NODE_ENV === 'development'
+          ? 'development.env'
+          : 'production.env',
     }),
     MongooseModule.forRoot(process.env.DB_URL),
     AuthModule,
