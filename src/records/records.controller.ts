@@ -125,6 +125,7 @@ export class RecordsController {
       throw new NotFoundException();
     }
     Object.keys(dto).forEach((field) => {
+      if (['autoAddress'].includes(field)) return;
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, record, field);
     });
     return this.recordsService.updateOne(record, dto);

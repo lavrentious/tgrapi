@@ -64,9 +64,23 @@ export class AbilityFactory {
     const defineForVerified = () => {
       can(Action.CREATE, this.recordModel);
       can(Action.DELETE, this.recordModel, { author: user._id });
-      can(Action.UPDATE, this.recordModel, ['name', 'description', 'photos'], {
-        author: user._id,
-      });
+      can(
+        Action.UPDATE,
+        this.recordModel,
+        [
+          'name',
+          'description',
+          'accessibility',
+          'address',
+          'lat',
+          'lon',
+          'type',
+          'photos',
+        ],
+        {
+          author: user._id,
+        },
+      );
       can(Action.READ, this.userModel, ['createdAt']);
       // cannot(Action.CREATE, 'VerificationRequest');
     };

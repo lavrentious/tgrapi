@@ -1,16 +1,38 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayUnique,
   IsArray,
+  IsBoolean,
+  IsEnum,
+  IsLatitude,
+  IsLongitude,
   IsMongoId,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
-import { MAX_PHOTOS } from '../schemas/record.schema';
-import { CreateRecordDto } from './create-record.dto';
+import { Address, MAX_PHOTOS, SpotType } from '../schemas/record.schema';
 
-export class UpdateRecordDto extends PartialType(CreateRecordDto) {
+class PartialAddress implements Partial<Address> {
+  @IsOptional()
+  @IsString()
+  region?: string;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  street?: string;
+
+  @IsOptional()
+  @IsString()
+  house?: string;
+}
+
+export class UpdateRecordDto {
   @IsOptional()
   @IsString()
   name?: string;
@@ -25,4 +47,29 @@ export class UpdateRecordDto extends PartialType(CreateRecordDto) {
   @IsMongoId({ each: true })
   @IsArray()
   photos?: string[];
+
+  @IsOptional()
+  @IsString()
+  accessibility?: string;
+
+  @IsOptional()
+  @IsLatitude()
+  lat?: number;
+
+  @IsOptional()
+  @IsLongitude()
+  lon?: number;
+
+  @IsOptional()
+  @IsEnum(SpotType)
+  type?: number;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PartialAddress)
+  address: PartialAddress;
+
+  @IsOptional()
+  @IsBoolean()
+  autoAddress?: boolean;
 }

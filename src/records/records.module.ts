@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AbilityModule } from 'src/ability/ability.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { GeoService } from './geo.service';
 import { PhotosService } from './photos.service';
 import { RecordsController } from './records.controller';
 import { RecordsService } from './records.service';
@@ -18,6 +19,6 @@ import { Record, RecordSchema } from './schemas/record.schema';
     CloudinaryModule,
   ],
   controllers: [RecordsController],
-  providers: [RecordsService, PhotosService],
+  providers: [RecordsService, PhotosService, GeoService],
 })
 export class RecordsModule {}
