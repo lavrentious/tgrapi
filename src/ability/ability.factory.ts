@@ -19,10 +19,6 @@ export enum Action {
   DELETE = 'delete',
 }
 
-// export type Subjects =
-//   | InferSubjects<typeof User>
-//   | InferSubjects<typeof Record>
-//   | 'all';
 export type AppAbility = Ability;
 
 @Injectable()

@@ -69,7 +69,6 @@ export class AuthService {
   async refresh(refreshToken: string, ipAddress: string, userAgent: string) {
     const decoded = this.tokenService.validateRefreshToken(refreshToken);
     const tokenFromDb = await this.tokenService.findRefreshToken(refreshToken);
-    console.log(refreshToken, decoded, tokenFromDb);
     if (!decoded || !tokenFromDb) {
       throw new UnauthorizedException('invalid token');
     }

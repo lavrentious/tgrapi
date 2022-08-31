@@ -71,7 +71,6 @@ export class RecordsService {
       const unusedPhotos = record.photos.filter(
         (id) => !newPhotos.has(id.toString()),
       );
-      console.log({ unusedPhotos });
       const deletionResult = this.photosService.deleteMany(unusedPhotos);
       return Promise.all([record.updateOne(dto), deletionResult]);
     }
