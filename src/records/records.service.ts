@@ -51,7 +51,6 @@ export class RecordsService {
 
   async findAll(params: FindRecordsQueryParams): Promise<FindAllResultDto[]> {
     // TODO: @casl/mongoose AccessibleRecords plugin
-    console.log(params);
     const { userLat, userLon, radius, search } = params;
     const query = this.recordModel.find();
     if (search) {
