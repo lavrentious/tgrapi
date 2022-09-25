@@ -6,12 +6,17 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Schema } from 'mongoose';
+import { escapeRegExp } from 'src/common/utils/escape-regexp';
 import { CreateRecordDto } from './dto/create-record.dto';
+import { FindAllResultDto } from './dto/find-all-result.dto';
+import { FindRecordsQueryParams } from './dto/find-records-query-params.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { GeoService } from './geo.service';
 import { PhotosService } from './photos.service';
 import { PhotoDocument } from './schemas/photo.schema';
 import { Record, RecordDocument } from './schemas/record.schema';
+
+export const CLOSEST_RADIUS = 300;
 
 @Injectable()
 export class RecordsService {
@@ -41,9 +46,35 @@ export class RecordsService {
     });
   }
 
-  async findAll(): Promise<RecordDocument[]> {
+  async findAll(params: FindRecordsQueryParams): Promise<FindAllResultDto[]> {
     // TODO: @casl/mongoose AccessibleRecords plugin
-    return this.recordModel.find();
+    console.log(params);
+    const { userLat, userLon, radius, search } = params;
+    const query = this.recordModel.find();
+    if (search) {
+      const regexp = new RegExp(escapeRegExp(search), 'gi');
+      query.find({
+        $or: [{ name: regexp }, { 'address.displayName': regexp }],
+      });
+    }
+    let result: FindAllResultDto[] = (await query
+      .select('-__v')
+      .lean()) as FindAllResultDto[];
+    if (userLat != null && userLon != null) {
+      result = result.map((r) => {
+        const azimuth = this.geoService.azimuth(userLat, userLon, r.lat, r.lon);
+        const direction = this.geoService.getDirection(azimuth);
+        const distance = this.geoService.haversine(
+          userLat,
+          userLon,
+          r.lat,
+          r.lon,
+        );
+        return { ...r, distance, azimuth, direction } as FindAllResultDto;
+      });
+      result = result.filter((r) => r.distance <= (radius || CLOSEST_RADIUS));
+    }
+    return result;
   }
 
   async findById(id: string | Schema.Types.ObjectId): Promise<RecordDocument> {

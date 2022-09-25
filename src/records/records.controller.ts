@@ -9,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -25,6 +26,8 @@ import { CreateRecordPolicyHandler } from 'src/records/policies/create-record.po
 import { UpdateRecordPolicyHandler } from 'src/records/policies/update-record.policy';
 import { UserDocument } from 'src/users/schemas/user.schema';
 import { CreateRecordDto } from './dto/create-record.dto';
+import { FindAllResultDto } from './dto/find-all-result.dto';
+import { FindRecordsQueryParams } from './dto/find-records-query-params.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { UploadPhotoDto } from './dto/upload-photo.dto';
@@ -101,8 +104,10 @@ export class RecordsController {
 
   @Get()
   @UseGuards(AnonymousJwtAuthGuard)
-  async findAll(): Promise<RecordDocument[]> {
-    return this.recordsService.findAll();
+  async findAll(
+    @Query() params: FindRecordsQueryParams,
+  ): Promise<FindAllResultDto[]> {
+    return this.recordsService.findAll(params);
   }
 
   @Get(':id')
