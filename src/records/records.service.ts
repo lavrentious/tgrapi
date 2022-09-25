@@ -7,6 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Schema } from 'mongoose';
 import { escapeRegExp } from 'src/common/utils/escape-regexp';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { FindAllResultDto } from './dto/find-all-result.dto';
 import { FindRecordsQueryParams } from './dto/find-records-query-params.dto';
@@ -23,6 +24,8 @@ export class RecordsService {
   constructor(
     @InjectModel(Record.name)
     private readonly recordModel: Model<RecordDocument>,
+    @InjectModel(User.name)
+    private readonly userModel: Model<UserDocument>,
     @Inject(forwardRef(() => PhotosService))
     private readonly photosService: PhotosService,
     private readonly geoService: GeoService,
@@ -77,8 +80,12 @@ export class RecordsService {
     return result;
   }
 
-  async findById(id: string | Schema.Types.ObjectId): Promise<RecordDocument> {
-    return this.recordModel.findById(id);
+  async findById(
+    id: string | Schema.Types.ObjectId,
+  ): Promise<RecordDocument & { author: { _id: string; username: string } }> {
+    return this.recordModel
+      .findById(id)
+      .populate('author', '_id username', this.userModel);
   }
 
   async removePhoto(
