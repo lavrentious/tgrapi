@@ -88,12 +88,8 @@ export class RecordsService {
     return result;
   }
 
-  async findById(
-    id: string | Schema.Types.ObjectId,
-  ): Promise<RecordDocument & { author: { _id: string; username: string } }> {
-    return this.recordModel
-      .findById(id)
-      .populate('author', '_id username', this.userModel);
+  async findById(id: string | Schema.Types.ObjectId): Promise<RecordDocument> {
+    return this.recordModel.findById(id);
   }
 
   async removePhoto(

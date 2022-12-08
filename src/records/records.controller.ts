@@ -113,7 +113,7 @@ export class RecordsController {
   @Get(':id')
   async findOne(
     @Param('id', new ParseObjectIdPipe()) id: string,
-  ): Promise<RecordDocument & { author: { _id: string; username: string } }> {
+  ): Promise<RecordDocument> {
     return this.recordsService.findById(id);
   }
 
