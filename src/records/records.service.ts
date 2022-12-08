@@ -54,7 +54,16 @@ export class RecordsService {
     const { userLat, userLon, radius, search } = params;
     const query = this.recordModel.find();
     if (search) {
-      const regexp = new RegExp(escapeRegExp(search), 'gi');
+      const regexp = new RegExp(
+        search
+          .trim()
+          .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '')
+          .split(/\s+/)
+          .map((w) => `(?=.*${escapeRegExp(w)})`)
+          .join('') + '.+',
+        'gi',
+      );
+      console.log(regexp);
       query.find({
         $or: [{ name: regexp }, { 'address.displayName': regexp }],
       });
