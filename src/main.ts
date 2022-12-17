@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
 import { AppModule } from './app.module';
 import { ForbiddenErrorFilter } from './common/filters/forbidden-error.filter';
 
@@ -29,6 +30,11 @@ async function bootstrap() {
   checkEnvVarsDefined();
   app.enableCors({ origin: process.env.CLIENT_URL, credentials: true });
   app.use(cookieParser());
+  app.use(
+    morgan(
+      '[:date[clf]] :method :url :status :response-time ms - :res[content-length]',
+    ),
+  );
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new ForbiddenErrorFilter());
   await app.listen(process.env.PORT || 8080);
