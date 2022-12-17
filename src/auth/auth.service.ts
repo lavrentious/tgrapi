@@ -11,6 +11,13 @@ import { PayloadDto } from './dto/payload.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TokenDocument } from './schemas/token.schema';
 
+export interface AuthResponseUser {
+  id: string;
+  username: string;
+  name?: string;
+  role: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -22,7 +29,11 @@ export class AuthService {
     dto: RegisterDto,
     ipAddress: string,
     userAgent: string,
-  ): Promise<{ accessToken: string; refreshToken: string; user: PayloadDto }> {
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: AuthResponseUser;
+  }> {
     const user = await this.userService.register(dto);
     const payload = new PayloadDto(user);
     const tokens = this.tokenService.generateTokens(payload);
@@ -32,7 +43,8 @@ export class AuthService {
       ipAddress,
       userAgent,
     );
-    return { ...tokens, user: { ...payload } };
+    const { id, username, name, role } = user;
+    return { ...tokens, user: { id, username, name, role } };
   }
 
   async login(
@@ -40,7 +52,11 @@ export class AuthService {
     password: string,
     ipAddress: string,
     userAgent: string,
-  ): Promise<{ accessToken: string; refreshToken: string; user: PayloadDto }> {
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: AuthResponseUser;
+  }> {
     const user =
       (await this.userService.findByEmail(usernameOrEmail)) ??
       (await this.userService.findByUsername(usernameOrEmail));
@@ -59,7 +75,8 @@ export class AuthService {
       ipAddress,
       userAgent,
     );
-    return { ...tokens, user: { ...payload } };
+    const { id, username, name, role } = user;
+    return { ...tokens, user: { id, username, name, role } };
   }
 
   async logout(refreshToken: string): Promise<TokenDocument> {
@@ -82,6 +99,7 @@ export class AuthService {
       ipAddress,
       userAgent,
     );
-    return { ...tokens, user: { ...payload } };
+    const { id, username, name, role } = user;
+    return { ...tokens, user: { id, username, name, role } };
   }
 }
