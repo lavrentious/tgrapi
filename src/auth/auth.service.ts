@@ -93,12 +93,15 @@ export class AuthService {
     const payload = new PayloadDto(user);
     const tokens = this.tokenService.generateTokens(payload);
 
-    await this.tokenService.saveRefreshToken(
-      payload.userId,
-      tokens.refreshToken,
-      ipAddress,
-      userAgent,
-    );
+    await Promise.all([
+      this.tokenService.saveRefreshToken(
+        payload.userId,
+        tokens.refreshToken,
+        ipAddress,
+        userAgent,
+      ),
+      tokenFromDb.remove(),
+    ]);
     const { id, username, name, role } = user;
     return { ...tokens, user: { id, username, name, role } };
   }

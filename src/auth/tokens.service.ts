@@ -41,14 +41,6 @@ export class TokensService {
     ipAddress: string,
     userAgent: string,
   ): Promise<TokenDocument> {
-    const token = await this.tokenModel.findOne({
-      user: userId,
-      ipAddress,
-      userAgent,
-    });
-    if (token) {
-      await token.remove();
-    }
     return this.tokenModel.create({
       user: userId,
       refreshToken,
