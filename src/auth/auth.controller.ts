@@ -11,6 +11,7 @@ import {
 import { Request, Response } from 'express';
 import { IpAddress } from 'src/common/decorators/ip-address.decorator';
 import { UserAgent } from 'src/common/decorators/user-agent.decorator';
+import { REFRESH_TOKEN_LIFESPAN } from './auth.module';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -27,7 +28,10 @@ export class AuthController {
     @UserAgent() userAgent: string,
   ) {
     const result = await this.authService.register(dto, ipAddress, userAgent);
-    res.cookie('refreshToken', result.refreshToken);
+    res.cookie('refreshToken', result.refreshToken, {
+      expires: new Date(Date.now() + REFRESH_TOKEN_LIFESPAN * 1000),
+      httpOnly: true,
+    });
     return result;
   }
 
@@ -44,7 +48,10 @@ export class AuthController {
       ipAddress,
       userAgent,
     );
-    res.cookie('refreshToken', result.refreshToken);
+    res.cookie('refreshToken', result.refreshToken, {
+      expires: new Date(Date.now() + REFRESH_TOKEN_LIFESPAN * 1000),
+      httpOnly: true,
+    });
     return result;
   }
 
@@ -70,12 +77,18 @@ export class AuthController {
     if (!refreshToken) {
       throw new UnauthorizedException('no refreshToken cookie present');
     }
-    const result = await this.authService.refresh(
-      refreshToken,
-      ipAddress,
-      userAgent,
-    );
-    res.cookie('refreshToken', result.refreshToken);
+    const result = await this.authService
+      .refresh(refreshToken, ipAddress, userAgent)
+      .catch((e) => {
+        if (e instanceof UnauthorizedException) {
+          res.clearCookie('refreshToken');
+        }
+        return e;
+      });
+    res.cookie('refreshToken', result.refreshToken, {
+      expires: new Date(Date.now() + REFRESH_TOKEN_LIFESPAN * 1000),
+      httpOnly: true,
+    });
     return result;
   }
 }
