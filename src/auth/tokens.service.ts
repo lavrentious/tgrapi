@@ -40,13 +40,21 @@ export class TokensService {
     refreshToken: string,
     ipAddress: string,
     userAgent: string,
+    tokenId?: string | ObjectId,
   ): Promise<TokenDocument> {
-    return this.tokenModel.create({
+    const tokenData = {
       user: userId,
       refreshToken,
       ipAddress,
       userAgent,
-    });
+    };
+    if (tokenId) {
+      return this.tokenModel.findByIdAndUpdate(tokenId, {
+        ...tokenData,
+        issuedAt: Date.now(),
+      });
+    }
+    return this.tokenModel.create(tokenData);
   }
 
   async deleteRefreshToken(
