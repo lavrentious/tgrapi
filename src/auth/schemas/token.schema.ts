@@ -28,3 +28,7 @@ export class Token {
 }
 
 export const TokenSchema = SchemaFactory.createForClass(Token);
+TokenSchema.index(
+  { issuedAt: 1 },
+  { expireAfterSeconds: REFRESH_TOKEN_LIFESPAN },
+);
