@@ -2,9 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as jwt from 'jsonwebtoken';
 import { Model, ObjectId, Query } from 'mongoose';
-import { ACCESS_TOKEN_LIFESPAN, REFRESH_TOKEN_LIFESPAN } from './auth.module';
 import { PayloadDto } from './dto/payload.dto';
-import { Token, TokenDocument } from './schemas/token.schema';
+import {
+  ACCESS_TOKEN_LIFESPAN,
+  REFRESH_TOKEN_LIFESPAN,
+  Token,
+  TokenDocument,
+} from './schemas/token.schema';
 
 @Injectable()
 export class TokensService {

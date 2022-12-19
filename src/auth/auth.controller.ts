@@ -11,10 +11,10 @@ import {
 import { Request, Response } from 'express';
 import { IpAddress } from 'src/common/decorators/ip-address.decorator';
 import { UserAgent } from 'src/common/decorators/user-agent.decorator';
-import { REFRESH_TOKEN_LIFESPAN } from './auth.module';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { REFRESH_TOKEN_LIFESPAN } from './schemas/token.schema';
 
 @Controller('auth')
 export class AuthController {
