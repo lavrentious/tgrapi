@@ -24,13 +24,14 @@ export class Token {
 
   @Prop({
     default: Date.now,
-    expires: REFRESH_TOKEN_LIFESPAN,
   })
   issuedAt: Date;
+
+  @Prop({
+    default: () => Date.now() + REFRESH_TOKEN_LIFESPAN * 1000,
+  })
+  expireAt: Date;
 }
 
 export const TokenSchema = SchemaFactory.createForClass(Token);
-TokenSchema.index(
-  { issuedAt: 1 },
-  { expireAfterSeconds: REFRESH_TOKEN_LIFESPAN },
-);
+TokenSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });

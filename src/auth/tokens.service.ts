@@ -56,6 +56,7 @@ export class TokensService {
       return this.tokenModel.findByIdAndUpdate(tokenId, {
         ...tokenData,
         issuedAt: Date.now(),
+        expireAt: Date.now() + REFRESH_TOKEN_LIFESPAN * 1000,
       });
     }
     return this.tokenModel.create(tokenData);
