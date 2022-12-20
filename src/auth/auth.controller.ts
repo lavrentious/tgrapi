@@ -83,7 +83,7 @@ export class AuthController {
         if (e instanceof UnauthorizedException) {
           res.clearCookie('refreshToken');
         }
-        return e;
+        throw e;
       });
     res.cookie('refreshToken', result.refreshToken, {
       expires: new Date(Date.now() + REFRESH_TOKEN_LIFESPAN * 1000),
