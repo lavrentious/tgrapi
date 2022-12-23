@@ -1,9 +1,7 @@
 import { RecordDocument } from '../schemas/record.schema';
 
-type Result = {
+export interface FindAllResultDto extends RecordDocument {
   distance?: number;
   direction?: string;
   azimuth?: number;
-};
-
-export type FindAllResultDto = RecordDocument | Result;
+}
