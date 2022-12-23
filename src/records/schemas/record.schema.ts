@@ -113,6 +113,7 @@ export class AddressWithDisplayName extends Address {
 export enum SpotType {
   USEFUL,
   SIGHT,
+  MISC,
 }
 
 @Schema({ timestamps: true })
