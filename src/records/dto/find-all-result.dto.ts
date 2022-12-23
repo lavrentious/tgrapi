@@ -1,9 +1,9 @@
 import { RecordDocument } from '../schemas/record.schema';
 
 type Result = {
-  distance: number | undefined;
-  direction: string | undefined;
-  azimuth: number | undefined;
+  distance?: number;
+  direction?: string;
+  azimuth?: number;
 };
 
-export type FindAllResultDto = RecordDocument & Result;
+export type FindAllResultDto = RecordDocument | Result;
