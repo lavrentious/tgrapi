@@ -25,7 +25,7 @@ export class GeoService {
       lon,
       count: 1,
     });
-    if (suggestions.length === 0) return null;
+    if (suggestions.length === 0) return {};
     const result = suggestions[0];
     const region = result.data.region_with_type;
     const city = result.data.city_with_type || result.data.settlement_with_type;
@@ -36,8 +36,12 @@ export class GeoService {
     return { ...address, displayName: this.getDisplayName(address) };
   }
 
-  getDisplayName(address: Address): string {
-    return `${address.region}, ${address.city}, ${address.street}, ${address.house}`;
+  getDisplayName(address: Address): string | null {
+    return (
+      [address.region, address.city, address.street, address.house]
+        .filter((e) => e != null)
+        .join(', ') || null
+    );
   }
 
   getFullAddress(address: Address): AddressWithDisplayName {

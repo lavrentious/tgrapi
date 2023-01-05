@@ -96,19 +96,19 @@ export const REGIONS: string[] = [
 ];
 export class Address {
   @IsString()
-  region: string;
+  region?: string;
 
   @IsString()
-  city: string;
+  city?: string;
 
   @IsString()
-  street: string;
+  street?: string;
 
   @IsString()
-  house: string;
+  house?: string;
 }
 export class AddressWithDisplayName extends Address {
-  displayName: string;
+  displayName?: string;
 }
 export enum SpotType {
   USEFUL,
