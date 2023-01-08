@@ -30,7 +30,10 @@ export class GeoService {
     const region = result.data.region_with_type;
     const city = result.data.city_with_type || result.data.settlement_with_type;
     const street = result.data.street_with_type;
-    const house = result.data.house_type + ' ' + result.data.house;
+    const house =
+      result.data.house_type && result.data.house
+        ? result.data.house_type + ' ' + result.data.house
+        : null;
 
     const address = { region, city, street, house };
     return { ...address, displayName: this.getDisplayName(address) };
