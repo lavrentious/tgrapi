@@ -114,7 +114,11 @@ export class RecordsController {
   async findOne(
     @Param('id', new ParseObjectIdPipe()) id: string,
   ): Promise<RecordDocument> {
-    return this.recordsService.findById(id);
+    const record = await this.recordsService.findById(id);
+    if (!record) {
+      throw new NotFoundException();
+    }
+    return record;
   }
 
   @Patch(':id')
