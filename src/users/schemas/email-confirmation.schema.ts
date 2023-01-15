@@ -4,7 +4,7 @@ import { User } from './user.schema';
 
 export type EmailConfirmationDocument = EmailConfirmation & Document;
 
-@Schema({ timestamps: true })
+@Schema({})
 export class EmailConfirmation {
   @Prop({ type: MongooseSchema.Types.ObjectId, required: true, ref: User.name })
   user: User;

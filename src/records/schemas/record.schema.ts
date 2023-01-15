@@ -147,6 +147,12 @@ export class Record {
     default: [],
   })
   photos: MongooseSchema.Types.ObjectId[];
+
+  @Prop({ required: false })
+  createdAt: Date;
+
+  @Prop({ required: false })
+  updatedAt: Date;
 }
 
 export const RecordSchema = SchemaFactory.createForClass(Record);
