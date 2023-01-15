@@ -14,7 +14,7 @@ import { FindRecordsQueryParams } from './dto/find-records-query-params.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { GeoService } from './geo.service';
 import { PhotosService } from './photos.service';
-import { PhotoDocument } from './schemas/photo.schema';
+import { Photo, PhotoDocument } from './schemas/photo.schema';
 import { Record, RecordDocument } from './schemas/record.schema';
 
 export const CLOSEST_RADIUS = 300;
@@ -24,6 +24,8 @@ export class RecordsService {
   constructor(
     @InjectModel(Record.name)
     private readonly recordModel: Model<RecordDocument>,
+    @InjectModel(Photo.name)
+    private readonly photoModel: Model<PhotoDocument>,
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
     @Inject(forwardRef(() => PhotosService))
@@ -89,7 +91,10 @@ export class RecordsService {
   }
 
   async findById(id: string | Schema.Types.ObjectId): Promise<RecordDocument> {
-    return this.recordModel.findById(id);
+    return this.recordModel
+      .findById(id)
+      .populate('author', 'username', this.userModel)
+      .populate('photos', '-__v', this.photoModel);
   }
 
   async removePhoto(
