@@ -90,11 +90,19 @@ export class RecordsService {
     return result;
   }
 
-  async findById(id: string | Schema.Types.ObjectId): Promise<RecordDocument> {
-    return this.recordModel
-      .findById(id)
-      .populate('author', 'username', this.userModel)
-      .populate('photos', '-__v', this.photoModel);
+  async findById(
+    id: string | Schema.Types.ObjectId,
+    populate = true,
+  ): Promise<RecordDocument> {
+    const q = this.recordModel.findById(id);
+    if (populate) {
+      q.populate('author', 'username', this.userModel).populate(
+        'photos',
+        '-__v',
+        this.photoModel,
+      );
+    }
+    return q;
   }
 
   async removePhoto(

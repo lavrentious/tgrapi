@@ -67,7 +67,7 @@ export class RecordsController {
     if (!file) {
       throw new BadRequestException('no file attached');
     }
-    const record = await this.recordsService.findById(id);
+    const record = await this.recordsService.findById(id, false);
     if (!record) {
       throw new NotFoundException();
     }
@@ -86,7 +86,7 @@ export class RecordsController {
     @Param('photoId', new ParseObjectIdPipe()) photoId: string,
     @RequestUser(AbilityPipe) ability: AppAbility,
   ) {
-    const record = await this.recordsService.findById(recordId);
+    const record = await this.recordsService.findById(recordId, false);
     if (!record) {
       throw new NotFoundException('record not found');
     }
@@ -129,7 +129,7 @@ export class RecordsController {
     @Body() dto: UpdateRecordDto,
     @RequestUser(AbilityPipe) ability: AppAbility,
   ) {
-    const record = await this.recordsService.findById(id);
+    const record = await this.recordsService.findById(id, false);
     if (!record) {
       throw new NotFoundException();
     }
@@ -149,7 +149,7 @@ export class RecordsController {
     @Body() dto: UpdatePhotoDto,
     @RequestUser(AbilityPipe) ability: AppAbility,
   ) {
-    const record = await this.recordsService.findById(recordId);
+    const record = await this.recordsService.findById(recordId, false);
     if (!record) {
       throw new NotFoundException();
     }
@@ -168,7 +168,7 @@ export class RecordsController {
     @Param('id', new ParseObjectIdPipe()) id: string,
     @RequestUser(AbilityPipe) ability: AppAbility,
   ) {
-    const record = await this.recordsService.findById(id);
+    const record = await this.recordsService.findById(id, false);
     if (!record) {
       throw new NotFoundException();
     }
