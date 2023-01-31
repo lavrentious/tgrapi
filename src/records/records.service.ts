@@ -126,7 +126,7 @@ export class RecordsService {
         (id) => !newPhotos.has(id.toString()),
       );
       const deletionResult = this.photosService.deleteMany(unusedPhotos);
-      return Promise.all([record.updateOne(dto), deletionResult]);
+      await Promise.all([record.updateOne(dto), deletionResult]);
     }
     if (dto.autoAddress) {
       const address = await this.geoService.addressByCoords(
@@ -140,10 +140,6 @@ export class RecordsService {
       for (const key of Object.keys(dto.address)) {
         query['address.' + key] = dto.address[key];
       }
-      query['address.displayName'] = this.geoService.getDisplayName({
-        ...record.address,
-        ...dto.address,
-      });
     }
     return this.recordModel.findByIdAndUpdate(record, query);
   }
