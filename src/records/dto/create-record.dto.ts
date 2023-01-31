@@ -4,7 +4,6 @@ import {
   IsEnum,
   IsLatitude,
   IsLongitude,
-  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -30,8 +29,8 @@ export class CreateRecordDto {
   lon: number;
 
   @IsEnum(SpotType)
-  @IsNumber()
-  type: number;
+  @IsString()
+  type: string;
 
   @IsOptional()
   @IsBoolean()

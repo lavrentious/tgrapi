@@ -112,9 +112,9 @@ export class AddressWithDisplayName extends Address {
   displayName?: string;
 }
 export enum SpotType {
-  USEFUL,
-  SIGHT,
-  MISC,
+  USEFUL = 'USEFUL',
+  SIGHT = 'SIGHT',
+  MISC = 'MISC',
 }
 
 @Schema({ timestamps: true })
