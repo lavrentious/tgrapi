@@ -23,7 +23,7 @@ export class PhotosService {
     file: Express.Multer.File,
     uploadDto: UploadPhotoDto,
     record: RecordDocument,
-  ): Promise<RecordDocument> {
+  ): Promise<PhotoDocument> {
     if (record.photos.length >= MAX_PHOTOS) {
       throw new BadRequestException('Photos limit reached');
     }
@@ -35,7 +35,8 @@ export class PhotosService {
     };
     const photo = await this.photoModel.create(createDto);
     record.photos.push(photo._id);
-    return record.save();
+    await record.save();
+    return photo;
   }
 
   async deleteOne(photoId: string): Promise<PhotoDocument> {
