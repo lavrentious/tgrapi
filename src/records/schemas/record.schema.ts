@@ -108,6 +108,7 @@ export class Address {
   house?: string;
 }
 export class AddressWithDisplayName extends Address {
+  @IsString()
   displayName?: string;
 }
 export enum SpotType {

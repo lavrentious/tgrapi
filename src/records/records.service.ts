@@ -44,7 +44,6 @@ export class RecordsService {
     return this.recordModel.create({
       ...dto,
       address: {
-        displayName: this.geoService.getDisplayName(address),
         ...address,
       },
       author: authorId,

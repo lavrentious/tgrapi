@@ -9,7 +9,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Address, SpotType } from '../schemas/record.schema';
+import { AddressWithDisplayName, SpotType } from '../schemas/record.schema';
 
 export class CreateRecordDto {
   @IsString()
@@ -39,6 +39,6 @@ export class CreateRecordDto {
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => Address)
-  address?: Address;
+  @Type(() => AddressWithDisplayName)
+  address?: AddressWithDisplayName;
 }
