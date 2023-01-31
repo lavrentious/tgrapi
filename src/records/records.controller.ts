@@ -95,10 +95,7 @@ export class RecordsController {
       record,
       'photos',
     );
-    const [, photoResult] = await Promise.all([
-      this.recordsService.removePhoto(record, photoId),
-      this.photosService.deleteOne(photoId),
-    ]);
+    const photoResult = await this.photosService.deleteOne(photoId);
     return photoResult;
   }
 
