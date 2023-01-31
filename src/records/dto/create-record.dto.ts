@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsEnum,
   IsLatitude,
   IsLongitude,
@@ -31,6 +32,10 @@ export class CreateRecordDto {
   @IsEnum(SpotType)
   @IsNumber()
   type: number;
+
+  @IsOptional()
+  @IsBoolean()
+  autoAddress?: boolean;
 
   @IsOptional()
   @ValidateNested()

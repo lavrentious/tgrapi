@@ -38,7 +38,7 @@ export class RecordsService {
     authorId: string,
   ): Promise<RecordDocument> {
     let { address } = dto;
-    if (!dto.address) {
+    if (!dto.address || dto.autoAddress) {
       address = await this.geoService.addressByCoords(dto.lat, dto.lon);
     }
     return this.recordModel.create({
