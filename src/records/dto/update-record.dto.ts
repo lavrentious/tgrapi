@@ -12,9 +12,13 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Address, MAX_PHOTOS, SpotType } from '../schemas/record.schema';
+import {
+  AddressWithDisplayName,
+  MAX_PHOTOS,
+  SpotType,
+} from '../schemas/record.schema';
 
-class PartialAddress implements Partial<Address> {
+class PartialAddress implements Partial<AddressWithDisplayName> {
   @IsOptional()
   @IsString()
   region?: string;
@@ -30,6 +34,10 @@ class PartialAddress implements Partial<Address> {
   @IsOptional()
   @IsString()
   house?: string;
+
+  @IsOptional()
+  @IsString()
+  displayName?: string;
 }
 
 export class UpdateRecordDto {
