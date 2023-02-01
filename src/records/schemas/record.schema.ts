@@ -117,7 +117,7 @@ export enum SpotType {
   MISC = 'MISC',
 }
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, minimize: false })
 export class Record {
   @Prop({ required: true })
   name: string;
