@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/users/schemas/user.schema';
 import { UsersModule } from 'src/users/users.module';
@@ -9,9 +10,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { TokensService } from './tokens.service';
 
 @Module({
-  providers: [AuthService, TokensService, JwtStrategy],
+  providers: [ConfigService, AuthService, TokensService, JwtStrategy],
   controllers: [AuthController],
   imports: [
+    ConfigModule,
     UsersModule,
     MongooseModule.forFeature([
       { name: Token.name, schema: TokenSchema },

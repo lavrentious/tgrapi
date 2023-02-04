@@ -1,16 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import { EnvironmentVariables } from 'src/env.validation';
 
 @Injectable()
 export class MailService {
   private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
-  constructor() {
+  constructor(
+    private readonly configService: ConfigService<EnvironmentVariables>,
+  ) {
     this.transporter = nodemailer.createTransport({
       service: 'Yandex',
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: this.configService.get('SMTP_USER'),
+        pass: this.configService.get('SMTP_PASS'),
       },
     });
   }
@@ -19,11 +23,13 @@ export class MailService {
     email: string,
     key: string,
   ): Promise<SMTPTransport.SentMessageInfo> {
-    const link = `${process.env.API_URL}/users/confirm-email/${key}`;
+    const link = `${this.configService.get(
+      'API_URL',
+    )}/users/confirm-email/${key}`;
     return this.transporter.sendMail({
-      from: process.env.SMTP_USER,
+      from: this.configService.get('SMTP_USER'),
       to: email,
-      subject: 'Account activation on ' + process.env.API_URL,
+      subject: 'Account activation on ' + this.configService.get('API_URL'),
       html: `
         <div>
           <h1>Activate your account</h1>

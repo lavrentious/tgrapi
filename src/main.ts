@@ -1,34 +1,20 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { AppModule } from './app.module';
 import { ForbiddenErrorFilter } from './common/filters/forbidden-error.filter';
-
-function checkEnvVarsDefined() {
-  const requiredVars = [
-    'PORT',
-    'DB_URL',
-    'JWT_ACCESS_SECRET',
-    'JWT_REFRESH_SECRET',
-    'SMTP_USER',
-    'SMTP_PASS',
-    'API_URL',
-    'CLIENT_URL',
-    'CLOUDINARY_CLOUD_NAME',
-    'CLOUDINARY_API_KEY',
-    'CLOUDINARY_API_SECRET',
-  ];
-  for (const varName of requiredVars) {
-    if (!(varName in process.env))
-      throw new Error('Environment variable missing: ' + varName);
-  }
-}
+import { EnvironmentVariables } from './env.validation';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  checkEnvVarsDefined();
-  app.enableCors({ origin: process.env.CLIENT_URL, credentials: true });
+  const configService =
+    app.get<ConfigService<EnvironmentVariables>>(ConfigService);
+  app.enableCors({
+    origin: configService.get('CLIENT_URL'),
+    credentials: true,
+  });
   app.use(cookieParser());
   app.use(
     morgan(
@@ -37,6 +23,6 @@ async function bootstrap() {
   );
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new ForbiddenErrorFilter());
-  await app.listen(process.env.PORT || 8080);
+  await app.listen(configService.get('PORT') || 8080);
 }
 bootstrap();

@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
+import { EnvironmentVariables } from 'src/env.validation';
 import { Address, AddressWithDisplayName } from './schemas/record.schema';
 
 const REVERSE_GEOCODING_URL =
@@ -8,9 +10,13 @@ const REVERSE_GEOCODING_URL =
 @Injectable()
 export class GeoService {
   axios: AxiosInstance;
-  constructor() {
+  constructor(
+    private readonly configService: ConfigService<EnvironmentVariables>,
+  ) {
     this.axios = axios.create({
-      headers: { Authorization: `Token ${process.env.DADATA_API_KEY}` },
+      headers: {
+        Authorization: `Token ${this.configService.get('DADATA_API_KEY')}`,
+      },
     });
   }
 

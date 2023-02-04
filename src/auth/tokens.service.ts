@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import * as jwt from 'jsonwebtoken';
 import { Model, ObjectId, Query } from 'mongoose';
+import { EnvironmentVariables } from 'src/env.validation';
 import { PayloadDto } from './dto/payload.dto';
 import {
   ACCESS_TOKEN_LIFESPAN,
@@ -13,6 +15,7 @@ import {
 @Injectable()
 export class TokensService {
   constructor(
+    private readonly configService: ConfigService<EnvironmentVariables>,
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,
   ) {}
 
@@ -22,7 +25,7 @@ export class TokensService {
   } {
     const accessToken = jwt.sign(
       { ...payload },
-      process.env.JWT_ACCESS_SECRET,
+      this.configService.get('JWT_ACCESS_SECRET'),
       {
         expiresIn: ACCESS_TOKEN_LIFESPAN,
       },
@@ -30,7 +33,7 @@ export class TokensService {
 
     const refreshToken = jwt.sign(
       { ...payload },
-      process.env.JWT_REFRESH_SECRET,
+      this.configService.get('JWT_REFRESH_SECRET'),
       {
         expiresIn: REFRESH_TOKEN_LIFESPAN,
       },
@@ -74,7 +77,10 @@ export class TokensService {
 
   validateAccessToken(accessToken: string): jwt.JwtPayload {
     try {
-      const payload = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
+      const payload = jwt.verify(
+        accessToken,
+        this.configService.get('JWT_ACCESS_SECRET'),
+      );
       if (typeof payload === 'string') throw new Error('invalid jwt');
       return payload;
     } catch (e) {
@@ -84,7 +90,10 @@ export class TokensService {
 
   validateRefreshToken(refreshToken: string): jwt.JwtPayload | PayloadDto {
     try {
-      const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+      const payload = jwt.verify(
+        refreshToken,
+        this.configService.get('JWT_REFRESH_SECRET'),
+      );
       if (typeof payload === 'string') throw new Error('invalid jwt');
       return payload;
     } catch (e) {
