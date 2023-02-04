@@ -1,9 +1,4 @@
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Schema } from 'mongoose';
 import { escapeRegExp } from 'src/common/utils/escape-regexp';
@@ -115,12 +110,11 @@ export class RecordsService {
   async updateOne(record: RecordDocument, dto: UpdateRecordDto): Promise<any> {
     const query = { ...dto };
     if (dto.photos) {
-      for (const id of dto.photos) {
-        const photo = await this.photosService.findById(id);
-        if (!photo) {
-          throw new NotFoundException(`photo with id ${id} not found`);
-        }
-      }
+      dto.photos = (
+        await Promise.all(dto.photos.map((id) => this.photosService.exists(id)))
+      )
+        .filter((e) => e != null)
+        .map((e) => e._id.toString());
       const newPhotos = new Set(dto.photos);
       const unusedPhotos = record.photos.filter(
         (id) => !newPhotos.has(id.toString()),

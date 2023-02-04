@@ -71,6 +71,10 @@ export class PhotosService {
     return this.photoModel.findById(id);
   }
 
+  async exists(id: string) {
+    return this.photoModel.exists({ _id: id });
+  }
+
   async updateOne(id: string, dto: UpdatePhotoDto): Promise<PhotoDocument> {
     const photo = await this.findById(id);
     if (!photo) {
