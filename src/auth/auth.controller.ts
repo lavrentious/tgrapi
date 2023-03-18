@@ -16,6 +16,15 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { REFRESH_TOKEN_LIFESPAN } from './schemas/token.schema';
 
+function setRefreshTokenCookie(res: Response, refreshToken: string) {
+  res.cookie('refreshToken', refreshToken, {
+    expires: new Date(Date.now() + REFRESH_TOKEN_LIFESPAN * 1000),
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -28,10 +37,7 @@ export class AuthController {
     @UserAgent() userAgent: string,
   ) {
     const result = await this.authService.register(dto, ipAddress, userAgent);
-    res.cookie('refreshToken', result.refreshToken, {
-      expires: new Date(Date.now() + REFRESH_TOKEN_LIFESPAN * 1000),
-      httpOnly: true,
-    });
+    setRefreshTokenCookie(res, result.refreshToken);
     return result;
   }
 
@@ -48,10 +54,7 @@ export class AuthController {
       ipAddress,
       userAgent,
     );
-    res.cookie('refreshToken', result.refreshToken, {
-      expires: new Date(Date.now() + REFRESH_TOKEN_LIFESPAN * 1000),
-      httpOnly: true,
-    });
+    setRefreshTokenCookie(res, result.refreshToken);
     return result;
   }
 
@@ -85,10 +88,7 @@ export class AuthController {
         }
         throw e;
       });
-    res.cookie('refreshToken', result.refreshToken, {
-      expires: new Date(Date.now() + REFRESH_TOKEN_LIFESPAN * 1000),
-      httpOnly: true,
-    });
+    setRefreshTokenCookie(res, result.refreshToken);
     return result;
   }
 }
