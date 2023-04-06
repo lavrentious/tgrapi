@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Schema } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { CreatePhotoDto } from './dto/create-photo.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
@@ -52,7 +52,7 @@ export class PhotosService {
     return dbResult;
   }
 
-  async deleteMany(ids: (string | Schema.Types.ObjectId)[]): Promise<{
+  async deleteMany(ids: (string | Types.ObjectId)[]): Promise<{
     deleted: (PhotoDocument | void)[];
     failed: string[];
   }> {

@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Schema } from 'mongoose';
+import { Model, Schema, Types } from 'mongoose';
 import { escapeRegExp } from 'src/common/utils/escape-regexp';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { CreateRecordDto } from './dto/create-record.dto';
@@ -30,7 +30,7 @@ export class RecordsService {
 
   async create(
     dto: CreateRecordDto,
-    authorId: string,
+    authorId: Types.ObjectId | string,
   ): Promise<RecordDocument> {
     let { address } = dto;
     if (!dto.address || dto.autoAddress) {
@@ -41,7 +41,7 @@ export class RecordsService {
       address: {
         ...address,
       },
-      author: authorId,
+      author: new Types.ObjectId(authorId),
     });
   }
 

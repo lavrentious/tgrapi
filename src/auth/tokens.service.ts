@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import * as jwt from 'jsonwebtoken';
-import { Model, ObjectId, Query } from 'mongoose';
+import { Model, Query, Types } from 'mongoose';
 import { EnvironmentVariables } from 'src/env.validation';
 import { PayloadDto } from './dto/payload.dto';
 import {
@@ -43,11 +43,11 @@ export class TokensService {
   }
 
   async saveRefreshToken(
-    userId: string | ObjectId,
+    userId: string | Types.ObjectId,
     refreshToken: string,
     ipAddress: string,
     userAgent: string,
-    tokenId?: string | ObjectId,
+    tokenId?: string | Types.ObjectId,
   ): Promise<TokenDocument> {
     const tokenData = {
       user: userId,

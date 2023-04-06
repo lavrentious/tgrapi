@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsString } from 'class-validator';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import * as mongoose from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { User } from 'src/users/schemas/user.schema';
 
 export const MAX_PHOTOS = 5;
 
-export type RecordDocument = Record & Document;
+export type RecordDocument = HydratedDocument<Record>;
 export const REGIONS: string[] = [
   'Респ Адыгея',
   'Респ Башкортостан',
@@ -119,6 +120,8 @@ export enum SpotType {
 
 @Schema({ timestamps: true, minimize: false })
 export class Record {
+  _id: Types.ObjectId;
+
   @Prop({ required: true })
   name: string;
 
@@ -140,14 +143,18 @@ export class Record {
   @Prop({ required: true, enum: SpotType })
   type: SpotType;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, required: true, ref: User.name })
-  author: User;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: User.name,
+  })
+  author: Types.ObjectId;
 
   @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Photo' }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Photo' }],
     default: [],
   })
-  photos: MongooseSchema.Types.ObjectId[];
+  photos: Types.ObjectId[];
 
   @Prop({ required: false })
   createdAt: Date;

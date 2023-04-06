@@ -1,17 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { Document } from 'mongoose';
-import { User } from 'src/users/schemas/user.schema';
+import { HydratedDocument, Types } from 'mongoose';
 
 export const ACCESS_TOKEN_LIFESPAN = 900;
 export const REFRESH_TOKEN_LIFESPAN = 2592000;
 
-export type TokenDocument = Token & Document;
+export type TokenDocument = HydratedDocument<Token>;
 
 @Schema()
 export class Token {
+  _id: Types.ObjectId;
+
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  user: User;
+  user: Types.ObjectId;
 
   @Prop({ required: true, unique: true })
   refreshToken: string;

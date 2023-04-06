@@ -1,12 +1,19 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import * as mongoose from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { User } from './user.schema';
 
-export type EmailConfirmationDocument = EmailConfirmation & Document;
+export type EmailConfirmationDocument = HydratedDocument<EmailConfirmation>;
 
 @Schema({})
 export class EmailConfirmation {
-  @Prop({ type: MongooseSchema.Types.ObjectId, required: true, ref: User.name })
+  _id: Types.ObjectId;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: User.name,
+  })
   user: User;
 
   @Prop({ required: true, unique: true })

@@ -1,10 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
-export type PhotoDocument = Photo & Document;
+export type PhotoDocument = HydratedDocument<Photo>;
 
 @Schema()
 export class Photo {
+  _id: Types.ObjectId;
+
   @Prop({ required: true })
   url: string;
 

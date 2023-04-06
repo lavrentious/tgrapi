@@ -59,7 +59,10 @@ export class UsersService {
     return this.userModel.findOne({ username });
   }
 
-  async findById(id: string, fields?: string): Promise<UserDocument> {
+  async findById(
+    id: Types.ObjectId | string,
+    fields?: string,
+  ): Promise<UserDocument> {
     return this.userModel.findById(id).select(fields);
   }
 
