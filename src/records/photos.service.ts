@@ -47,7 +47,7 @@ export class PhotosService {
 
     const [, dbResult] = await Promise.all([
       this.cloudinaryService.deleteImage(photo.publicId),
-      photo.remove(),
+      photo.deleteOne(),
     ]);
     return dbResult;
   }

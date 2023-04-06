@@ -129,7 +129,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException();
     }
-    return user.remove();
+    return user.deleteOne();
   }
 
   private async checkIsEmailTaken(

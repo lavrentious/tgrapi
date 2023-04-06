@@ -144,7 +144,7 @@ export class RecordsService {
   }> {
     const [photoResult, recordResult] = await Promise.all([
       this.photosService.deleteMany(record.photos),
-      record.remove(),
+      record.deleteOne(),
     ]);
     return { record: recordResult, photos: photoResult };
   }
