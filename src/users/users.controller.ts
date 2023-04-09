@@ -10,7 +10,7 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
-import { OmitType } from '@nestjs/mapped-types';
+import { ApiOkResponse, ApiTags, OmitType } from '@nestjs/swagger';
 import { Action, AppAbility } from 'src/ability/ability.factory';
 import { AbilityPipe } from 'src/ability/ability.pipe';
 import { SetAndCheckPolicies } from 'src/ability/decorators/set-and-check-policies.decorator';
@@ -27,10 +27,12 @@ import { UsersService } from './users.service';
 // TODO: optional values based on ability
 class PublicUser extends OmitType(User, ['password']) {}
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  @ApiOkResponse({ type: PublicUser })
   @UseGuards(JwtAuthGuard)
   @Get('/me')
   async me(@RequestUser() user: User): Promise<PublicUser> {
@@ -39,6 +41,7 @@ export class UsersController {
     return res;
   }
 
+  @ApiOkResponse({ type: PublicUser })
   @Get(':id')
   @UseGuards(AnonymousJwtAuthGuard)
   async getById(
@@ -49,11 +52,13 @@ export class UsersController {
     return res;
   }
 
+  @ApiOkResponse({ type: [PublicUser] })
   @Get()
   async getAll(): Promise<PublicUser[]> {
     return this.userService.findAll('-__v -password');
   }
 
+  @ApiOkResponse({ type: PublicUser })
   @Delete(':id')
   @SetAndCheckPolicies(DeleteUserPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -67,6 +72,7 @@ export class UsersController {
     return this.userService.deleteById(id);
   }
 
+  @ApiOkResponse({ type: PublicUser })
   @Patch(':id')
   @SetAndCheckPolicies(UpdateUserPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -87,6 +93,7 @@ export class UsersController {
     return res;
   }
 
+  @ApiOkResponse({ type: String })
   @Get('confirm-email/:key')
   async confirmEmail(@Param('key') key: string): Promise<string> {
     return this.userService.confirmEmail(key);
