@@ -33,7 +33,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get('/me')
   async me(@RequestUser() user: User): Promise<PublicUser> {
-    return this.userService.findById(user._id, '-__v -password');
+    const res = await this.userService.findById(user._id, '-__v -password');
+    if (!res) throw new NotFoundException();
+    return res;
   }
 
   @Get(':id')
@@ -41,7 +43,9 @@ export class UsersController {
   async getById(
     @Param('id', new ParseObjectIdPipe()) id: string,
   ): Promise<PublicUser> {
-    return this.userService.findById(id, '-__v -password');
+    const res = await this.userService.findById(id, '-__v -password');
+    if (!res) throw new NotFoundException();
+    return res;
   }
 
   @Get()
@@ -66,7 +70,7 @@ export class UsersController {
   @SetAndCheckPolicies(UpdateUserPolicyHandler)
   @UseGuards(JwtAuthGuard)
   async updateById(
-    @Param('id', new ParseObjectIdPipe()) id,
+    @Param('id', new ParseObjectIdPipe()) id: string,
     @Body() dto: UpdateUserDto,
     @RequestUser(AbilityPipe) ability: AppAbility,
   ): Promise<PublicUser> {
