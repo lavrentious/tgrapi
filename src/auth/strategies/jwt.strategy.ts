@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: PayloadDto): Promise<UserDocument> {
+  async validate(payload: PayloadDto): Promise<User> {
     return this.userModel.findById(payload.userId).lean();
   }
 }

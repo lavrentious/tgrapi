@@ -29,7 +29,7 @@ export class AbilityFactory {
     private readonly recordModel: Model<RecordDocument>,
   ) {}
 
-  defineAbility(user: UserDocument | null) {
+  defineAbility(user: User | null) {
     type Subjects =
       | InferSubjects<typeof this.userModel>
       | InferSubjects<typeof this.recordModel>

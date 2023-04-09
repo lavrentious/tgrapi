@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Schema, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { escapeRegExp } from 'src/common/utils/escape-regexp';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { CreateRecordDto } from './dto/create-record.dto';
@@ -85,7 +85,7 @@ export class RecordsService {
   }
 
   async findById(
-    id: string | Schema.Types.ObjectId,
+    id: string | Types.ObjectId,
     populate = true,
   ): Promise<RecordDocument> {
     const q = this.recordModel.findById(id);
@@ -140,7 +140,7 @@ export class RecordsService {
 
   async deleteOne(record: RecordDocument): Promise<{
     record: RecordDocument;
-    photos: { deleted: (void | PhotoDocument)[]; failed: string[] };
+    photos: { deleted: (void | Photo)[]; failed: string[] };
   }> {
     const [photoResult, recordResult] = await Promise.all([
       this.photosService.deleteMany(record.photos),

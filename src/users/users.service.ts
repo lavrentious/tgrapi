@@ -48,22 +48,22 @@ export class UsersService {
   }
 
   async findAll(fields?: string): Promise<UserDocument[]> {
-    return this.userModel.find().select(fields);
+    return this.userModel.find().select(fields).exec();
   }
 
   async findByEmail(email: string): Promise<UserDocument> {
-    return this.userModel.findOne({ email });
+    return this.userModel.findOne({ email }).exec();
   }
 
   async findByUsername(username: string): Promise<UserDocument> {
-    return this.userModel.findOne({ username });
+    return this.userModel.findOne({ username }).exec();
   }
 
   async findById(
     id: Types.ObjectId | string,
     fields?: string,
   ): Promise<UserDocument> {
-    return this.userModel.findById(id).select(fields);
+    return this.userModel.findById(id).select(fields).exec();
   }
 
   async updateOne(
@@ -101,7 +101,7 @@ export class UsersService {
     if (name !== undefined) {
       user.name = name;
     }
-    return user.save();
+    return user.updateOne(undefined, { new: true });
   }
 
   async confirmEmail(key: string): Promise<string> {
@@ -120,27 +120,27 @@ export class UsersService {
     }
     user.emailConfirmed = true;
     await user.save();
-    await emailConfirmation.deleteOne();
+    await emailConfirmation.deleteOne().exec();
     return 'email is confirmed successfully';
   }
 
-  async deleteById(id: string): Promise<UserDocument> {
+  async deleteById(id: string): Promise<User> {
     const user = await this.findById(id);
     if (!user) {
       throw new NotFoundException();
     }
-    return user.deleteOne();
+    return user.deleteOne().select('-__v -password').exec();
   }
 
   private async checkIsEmailTaken(
     email: string,
   ): Promise<{ _id: Types.ObjectId } | null> {
-    return this.userModel.exists({ email });
+    return this.userModel.exists({ email }).exec();
   }
 
   private async checkIsUsernameTaken(
     username: string,
   ): Promise<{ _id: Types.ObjectId } | null> {
-    return this.userModel.exists({ username });
+    return this.userModel.exists({ username }).exec();
   }
 }

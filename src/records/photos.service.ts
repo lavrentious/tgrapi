@@ -53,7 +53,7 @@ export class PhotosService {
   }
 
   async deleteMany(ids: (string | Types.ObjectId)[]): Promise<{
-    deleted: (PhotoDocument | void)[];
+    deleted: (Photo | void)[];
     failed: string[];
   }> {
     const failed: string[] = [];

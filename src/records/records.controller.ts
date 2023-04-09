@@ -24,7 +24,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ParseObjectIdPipe } from 'src/common/pipes/parse-object-id.pipe';
 import { CreateRecordPolicyHandler } from 'src/records/policies/create-record.policy';
 import { UpdateRecordPolicyHandler } from 'src/records/policies/update-record.policy';
-import { UserDocument } from 'src/users/schemas/user.schema';
+import { User } from 'src/users/schemas/user.schema';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { FindAllResultDto } from './dto/find-all-result.dto';
 import { FindRecordsQueryParams } from './dto/find-records-query-params.dto';
@@ -35,7 +35,7 @@ import { MulterImageOptions } from './multer.config';
 import { PhotosService } from './photos.service';
 import { DeleteRecordPolicyHandler } from './policies/delete-record.policy';
 import { RecordsService } from './records.service';
-import { RecordDocument } from './schemas/record.schema';
+import { Record } from './schemas/record.schema';
 
 @Controller('records')
 export class RecordsController {
@@ -49,8 +49,8 @@ export class RecordsController {
   @UseGuards(JwtAuthGuard)
   async create(
     @Body() dto: CreateRecordDto,
-    @RequestUser() currentUser: UserDocument,
-  ): Promise<RecordDocument> {
+    @RequestUser() currentUser: User,
+  ): Promise<Record> {
     return this.recordsService.create(dto, currentUser._id);
   }
 
@@ -110,7 +110,7 @@ export class RecordsController {
   @Get(':id')
   async findOne(
     @Param('id', new ParseObjectIdPipe()) id: string,
-  ): Promise<RecordDocument> {
+  ): Promise<Record> {
     const record = await this.recordsService.findById(id);
     if (!record) {
       throw new NotFoundException();

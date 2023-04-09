@@ -9,17 +9,22 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
+import { OmitType } from '@nestjs/mapped-types';
 import { Action, AppAbility } from 'src/ability/ability.factory';
 import { AbilityPipe } from 'src/ability/ability.pipe';
 import { SetAndCheckPolicies } from 'src/ability/decorators/set-and-check-policies.decorator';
 import { RequestUser } from 'src/auth/decorators/request-user.decorator';
+import { AnonymousJwtAuthGuard } from 'src/auth/guards/anonymous-jwt-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ParseObjectIdPipe } from 'src/common/pipes/parse-object-id.pipe';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserPolicyHandler } from './policies/delete-user.policy';
 import { UpdateUserPolicyHandler } from './policies/update-user.policy';
-import { UserDocument } from './schemas/user.schema';
+import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
+
+// TODO: optional values based on ability
+class PublicUser extends OmitType(User, ['password']) {}
 
 @Controller('users')
 export class UsersController {
@@ -27,20 +32,21 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/me')
-  async me(@RequestUser() user: UserDocument): Promise<UserDocument> {
-    return this.userService.findById(user._id, '-__v -password -activationKey');
+  async me(@RequestUser() user: User): Promise<PublicUser> {
+    return this.userService.findById(user._id, '-__v -password');
   }
 
   @Get(':id')
+  @UseGuards(AnonymousJwtAuthGuard)
   async getById(
     @Param('id', new ParseObjectIdPipe()) id: string,
-  ): Promise<UserDocument> {
-    return this.userService.findById(id, '-__v -password -activationKey');
+  ): Promise<PublicUser> {
+    return this.userService.findById(id, '-__v -password');
   }
 
   @Get()
-  async getAll(): Promise<UserDocument[]> {
-    return this.userService.findAll('-__v -password -activationKey');
+  async getAll(): Promise<PublicUser[]> {
+    return this.userService.findAll('-__v -password');
   }
 
   @Delete(':id')
@@ -49,7 +55,7 @@ export class UsersController {
   async deleteById(
     @Param('id', new ParseObjectIdPipe()) id: string,
     @RequestUser(AbilityPipe) ability: AppAbility,
-  ): Promise<UserDocument> {
+  ): Promise<PublicUser> {
     const user = await this.userService.findById(id);
     if (!user) throw new NotFoundException();
     ForbiddenError.from(ability).throwUnlessCan(Action.DELETE, user);
@@ -63,7 +69,7 @@ export class UsersController {
     @Param('id', new ParseObjectIdPipe()) id,
     @Body() dto: UpdateUserDto,
     @RequestUser(AbilityPipe) ability: AppAbility,
-  ): Promise<UserDocument> {
+  ): Promise<PublicUser> {
     const user = await this.userService.findById(id);
     if (!user) throw new NotFoundException();
     Object.keys(dto).forEach((field) => {
