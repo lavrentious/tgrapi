@@ -9,15 +9,22 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import {
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { IpAddress } from 'src/common/decorators/ip-address.decorator';
 import { UserAgent } from 'src/common/decorators/user-agent.decorator';
 import { Environment, EnvironmentVariables } from 'src/env.validation';
 import { AuthService } from './auth.service';
+import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { REFRESH_TOKEN_LIFESPAN } from './schemas/token.schema';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -39,6 +46,7 @@ export class AuthController {
     });
   }
 
+  @ApiOkResponse({ type: AuthResponseDto })
   @Post('register')
   async register(
     @Body() dto: RegisterDto,
@@ -51,6 +59,7 @@ export class AuthController {
     return result;
   }
 
+  @ApiOkResponse({ type: AuthResponseDto })
   @Post('login')
   async login(
     @Body() dto: LoginDto,
@@ -68,17 +77,19 @@ export class AuthController {
     return result;
   }
 
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
   @Delete('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
       throw new UnauthorizedException('no refreshToken cookie present');
     }
-    const result = this.authService.logout(refreshToken);
     res.clearCookie('refreshToken');
-    return result;
+    await this.authService.logout(refreshToken);
   }
 
+  @ApiOkResponse({ type: AuthResponseDto })
   @Get('refresh')
   async refresh(
     @Req() req: Request,

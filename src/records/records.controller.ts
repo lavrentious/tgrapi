@@ -15,6 +15,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Action, AppAbility } from 'src/ability/ability.factory';
 import { AbilityPipe } from 'src/ability/ability.pipe';
 import { SetAndCheckPolicies } from 'src/ability/decorators/set-and-check-policies.decorator';
@@ -35,8 +41,12 @@ import { MulterImageOptions } from './multer.config';
 import { PhotosService } from './photos.service';
 import { DeleteRecordPolicyHandler } from './policies/delete-record.policy';
 import { RecordsService } from './records.service';
+import { Photo } from './schemas/photo.schema';
 import { Record } from './schemas/record.schema';
 
+@ApiForbiddenResponse()
+@ApiUnauthorizedResponse()
+@ApiTags('records')
 @Controller('records')
 export class RecordsController {
   constructor(
@@ -44,6 +54,7 @@ export class RecordsController {
     private readonly photosService: PhotosService,
   ) {}
 
+  @ApiOkResponse({ type: Record })
   @Post()
   @SetAndCheckPolicies(CreateRecordPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -54,6 +65,7 @@ export class RecordsController {
     return this.recordsService.create(dto, currentUser._id);
   }
 
+  @ApiOkResponse({ type: Photo })
   @Post('/:id/photos')
   @UseInterceptors(FileInterceptor('file', MulterImageOptions))
   @SetAndCheckPolicies(UpdateRecordPolicyHandler)
@@ -79,6 +91,7 @@ export class RecordsController {
     return this.photosService.create(file, dto, record);
   }
 
+  @ApiOkResponse({ type: Photo })
   @Delete('/:recordId/photos/:photoId')
   @UseGuards(JwtAuthGuard)
   async deletePhoto(
@@ -99,6 +112,7 @@ export class RecordsController {
     return photoResult;
   }
 
+  @ApiOkResponse({ type: [Record] })
   @Get()
   @UseGuards(AnonymousJwtAuthGuard)
   async findAll(
@@ -107,6 +121,7 @@ export class RecordsController {
     return this.recordsService.findAll(params);
   }
 
+  @ApiOkResponse({ type: Record })
   @Get(':id')
   async findOne(
     @Param('id', new ParseObjectIdPipe()) id: string,
@@ -118,6 +133,7 @@ export class RecordsController {
     return record;
   }
 
+  @ApiOkResponse({ type: Record })
   @Patch(':id')
   @SetAndCheckPolicies(UpdateRecordPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -137,6 +153,7 @@ export class RecordsController {
     return this.recordsService.updateOne(record, dto);
   }
 
+  @ApiOkResponse({ type: Photo })
   @Patch(':recordId/photos/:photoId')
   @SetAndCheckPolicies(UpdateRecordPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -158,6 +175,9 @@ export class RecordsController {
     return this.photosService.updateOne(photoId, dto);
   }
 
+  @ApiOkResponse({
+    type: Record,
+  })
   @Delete(':id')
   @SetAndCheckPolicies(DeleteRecordPolicyHandler)
   @UseGuards(JwtAuthGuard)

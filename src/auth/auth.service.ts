@@ -7,6 +7,7 @@ import {
 import * as argon from 'argon2';
 import { TokensService } from 'src/auth/tokens.service';
 import { UsersService } from 'src/users/users.service';
+import { AuthResponseDto } from './dto/auth-response.dto';
 import { PayloadDto } from './dto/payload.dto';
 import { RegisterDto } from './dto/register.dto';
 import { TokenDocument } from './schemas/token.schema';
@@ -29,11 +30,7 @@ export class AuthService {
     dto: RegisterDto,
     ipAddress: string,
     userAgent: string,
-  ): Promise<{
-    accessToken: string;
-    refreshToken: string;
-    user: AuthResponseUser;
-  }> {
+  ): Promise<AuthResponseDto> {
     const user = await this.userService.register(dto);
     const payload = new PayloadDto(user);
     const tokens = this.tokenService.generateTokens(payload);
@@ -52,11 +49,7 @@ export class AuthService {
     password: string,
     ipAddress: string,
     userAgent: string,
-  ): Promise<{
-    accessToken: string;
-    refreshToken: string;
-    user: AuthResponseUser;
-  }> {
+  ): Promise<AuthResponseDto> {
     const user =
       (await this.userService.findByEmail(usernameOrEmail)) ??
       (await this.userService.findByUsername(usernameOrEmail));
@@ -83,7 +76,11 @@ export class AuthService {
     return this.tokenService.deleteRefreshToken(refreshToken);
   }
 
-  async refresh(refreshToken: string, ipAddress: string, userAgent: string) {
+  async refresh(
+    refreshToken: string,
+    ipAddress: string,
+    userAgent: string,
+  ): Promise<AuthResponseDto> {
     const decoded = this.tokenService.validateRefreshToken(refreshToken);
     const tokenFromDb = await this.tokenService.findRefreshToken(refreshToken);
     if (!decoded || !tokenFromDb) {
