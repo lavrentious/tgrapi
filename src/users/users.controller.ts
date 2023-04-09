@@ -1,5 +1,6 @@
 import { ForbiddenError } from '@casl/ability';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -76,10 +77,14 @@ export class UsersController {
   ): Promise<PublicUser> {
     const user = await this.userService.findById(id);
     if (!user) throw new NotFoundException();
+    if (Object.keys(dto).length === 0) throw new BadRequestException();
     Object.keys(dto).forEach((field) => {
       ForbiddenError.from(ability).throwUnlessCan(Action.UPDATE, user, field);
     });
-    return this.userService.updateOne(user, dto);
+    const { password: _, ...res } = (
+      await this.userService.updateOne(user, dto)
+    ).toObject();
+    return res;
   }
 
   @Get('confirm-email/:key')

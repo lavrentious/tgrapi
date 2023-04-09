@@ -101,7 +101,7 @@ export class UsersService {
     if (name !== undefined) {
       user.name = name;
     }
-    return user.updateOne(undefined, { new: true });
+    return user.save();
   }
 
   async confirmEmail(key: string): Promise<string> {
