@@ -91,7 +91,8 @@ export class UsersService {
     if (password) {
       user.password = await argon2.hash(password);
     }
-    if (username !== undefined && user.username !== username) {
+    if (username === null) user.username = undefined;
+    else if (username !== undefined && user.username !== username) {
       const candidate = await this.checkIsUsernameTaken(username);
       if (candidate) {
         throw new BadRequestException('username taken');
