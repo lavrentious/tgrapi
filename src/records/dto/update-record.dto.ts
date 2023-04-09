@@ -10,6 +10,7 @@ import {
   IsMongoId,
   IsOptional,
   IsString,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import {
@@ -41,8 +42,8 @@ class PartialAddress implements Partial<AddressWithDisplayName> {
 }
 
 export class UpdateRecordDto {
-  @IsOptional()
   @IsString()
+  @ValidateIf((_, value) => value !== undefined)
   name?: string;
 
   @IsOptional()
@@ -68,8 +69,8 @@ export class UpdateRecordDto {
   @IsLongitude()
   lon?: number;
 
-  @IsOptional()
   @IsEnum(SpotType)
+  @ValidateIf((_, value) => value !== undefined)
   type?: number;
 
   @IsOptional()

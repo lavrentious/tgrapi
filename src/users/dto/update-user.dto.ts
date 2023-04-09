@@ -1,21 +1,37 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import {
+  IsDefined,
+  IsEmail,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+  ValidateIf,
+} from 'class-validator';
 import { RegisterDto } from 'src/auth/dto/register.dto';
+import * as rules from 'src/auth/utils/validations';
 
 export class UpdateUserDto extends PartialType(RegisterDto) {
-  @IsOptional()
   @IsEmail()
+  @IsDefined()
+  @ValidateIf((_, value) => value !== undefined)
   email?: string;
 
-  @IsOptional()
+  @Matches(rules.password.regexp)
+  @Length(rules.password.length.min, rules.password.length.max)
   @IsString()
+  @IsDefined()
+  @ValidateIf((_, value) => value !== undefined)
   password?: string;
 
-  @IsOptional()
   @IsString()
-  username?: string | null;
-
+  @Length(rules.name.length.min, rules.name.length.max)
   @IsOptional()
-  @IsString()
   name?: string | null;
+
+  @Matches(rules.username.regexp)
+  @Length(rules.username.length.min, rules.username.length.max)
+  @IsString()
+  @IsOptional()
+  username?: string | null;
 }
