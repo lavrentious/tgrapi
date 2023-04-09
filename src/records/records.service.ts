@@ -135,7 +135,7 @@ export class RecordsService {
         query['address.' + key] = dto.address[key];
       }
     }
-    return this.recordModel.findByIdAndUpdate(record, query);
+    return this.recordModel.findByIdAndUpdate(record, query, { new: true });
   }
 
   async deleteOne(record: RecordDocument): Promise<{
