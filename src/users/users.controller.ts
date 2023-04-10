@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags, OmitType } from '@nestjs/swagger';
+import { isValidObjectId } from 'mongoose';
 import { Action, AppAbility } from 'src/ability/ability.factory';
 import { AbilityPipe } from 'src/ability/ability.pipe';
 import { SetAndCheckPolicies } from 'src/ability/decorators/set-and-check-policies.decorator';
@@ -42,12 +43,19 @@ export class UsersController {
   }
 
   @ApiOkResponse({ type: PublicUser })
-  @Get(':id')
+  @Get(':idOrUsername')
   @UseGuards(AnonymousJwtAuthGuard)
   async getById(
-    @Param('id', new ParseObjectIdPipe()) id: string,
+    @Param('idOrUsername') idOrUsername: string,
   ): Promise<PublicUser> {
-    const res = await this.userService.findById(id, '-__v -password');
+    let res: User;
+    if (isValidObjectId(idOrUsername))
+      res = await this.userService.findById(idOrUsername, '-__v -password');
+    else
+      res = await this.userService.findByUsername(
+        idOrUsername,
+        '-__v -password',
+      );
     if (!res) throw new NotFoundException();
     return res;
   }
