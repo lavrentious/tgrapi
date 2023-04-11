@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import { Request } from 'express';
 import morgan from 'morgan';
 import { version } from '../package.json';
 import { AppModule } from './app.module';
@@ -21,6 +22,9 @@ async function bootstrap() {
   app.use(
     morgan(
       '[:date[clf]] :method :url :status :response-time ms - :res[content-length]',
+      {
+        skip: (req: Request) => req.originalUrl.startsWith('/api'),
+      },
     ),
   );
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
