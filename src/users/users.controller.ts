@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Param,
   Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags, OmitType } from '@nestjs/swagger';
@@ -99,6 +100,13 @@ export class UsersController {
       await this.userService.updateOne(user, dto)
     ).toObject();
     return res;
+  }
+
+  @ApiOkResponse()
+  @UseGuards(JwtAuthGuard)
+  @Post('confirm-email')
+  async resendEmailConfirmation(@RequestUser() user: User): Promise<void> {
+    return this.userService.resendEmailConfirmation(user);
   }
 
   @ApiOkResponse({ type: String })

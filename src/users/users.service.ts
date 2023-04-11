@@ -136,6 +136,13 @@ export class UsersService {
     return 'email is confirmed successfully';
   }
 
+  async resendEmailConfirmation(user: User) {
+    console.log(`reconfirm`, user);
+    if (user.emailConfirmed)
+      throw new BadRequestException('email already confirmed');
+    await this.saveEmailConfirmation(user._id, user.email);
+  }
+
   async deleteById(id: string): Promise<User> {
     const user = await this.findById(id);
     if (!user) {
