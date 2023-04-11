@@ -40,6 +40,7 @@ export class UsersService {
         user: new Types.ObjectId(userId),
       });
     emailConfirmation.key = key;
+    emailConfirmation.createdAt = new Date();
     return Promise.all([
       emailConfirmation.save(),
       this.mailService.sendActivationEmail(email, key),
