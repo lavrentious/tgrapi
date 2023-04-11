@@ -27,6 +27,25 @@ export class UsersService {
     private readonly emailConfirmationModel: Model<EmailConfirmationDocument>,
   ) {}
 
+  private async saveEmailConfirmation(
+    userId: Types.ObjectId | string,
+    email: string,
+  ) {
+    const key = uuidv4();
+    const emailConfirmation =
+      (await this.emailConfirmationModel.findOne({
+        user: new Types.ObjectId(userId),
+      })) ??
+      new this.emailConfirmationModel({
+        user: new Types.ObjectId(userId),
+      });
+    emailConfirmation.key = key;
+    return Promise.all([
+      emailConfirmation.save(),
+      this.mailService.sendActivationEmail(email, key),
+    ]);
+  }
+
   async register(dto: RegisterDto): Promise<UserDocument> {
     if (await this.checkIsEmailTaken(dto.email)) {
       throw new HttpException('email taken', HttpStatus.BAD_REQUEST);
@@ -35,15 +54,11 @@ export class UsersService {
       throw new HttpException('username taken', HttpStatus.BAD_REQUEST);
     }
     const hashedPassword = await argon2.hash(dto.password);
-    const key = uuidv4();
     const user = await this.userModel.create({
       ...dto,
       password: hashedPassword,
     });
-    await Promise.all([
-      this.emailConfirmationModel.create({ user, key }),
-      this.mailService.sendActivationEmail(dto.email, key),
-    ]);
+    await this.saveEmailConfirmation(user._id, dto.email);
     return user;
   }
 
@@ -81,15 +96,7 @@ export class UsersService {
       }
       user.email = email;
       user.emailConfirmed = false;
-      const key = uuidv4();
-      const emailConfirmation = await this.emailConfirmationModel.findOne({
-        user,
-      });
-      if (emailConfirmation) {
-        emailConfirmation.key = key;
-      }
-
-      this.mailService.sendActivationEmail(email, key);
+      this.saveEmailConfirmation(user._id, email);
     }
     if (password) {
       user.password = await argon2.hash(password);
@@ -124,7 +131,7 @@ export class UsersService {
     }
     user.emailConfirmed = true;
     await user.save();
-    await emailConfirmation.deleteOne().exec();
+    await emailConfirmation.deleteOne();
     return 'email is confirmed successfully';
   }
 
