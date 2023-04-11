@@ -33,6 +33,19 @@ async function bootstrap() {
     .setTitle('TGR API')
     .setDescription('The TGR API description')
     .setVersion(version)
+    .addBearerAuth({
+      type: 'http',
+      name: 'Authorization',
+      in: 'header',
+      bearerFormat: 'JWT',
+      scheme: 'bearer',
+    })
+    .addCookieAuth('refreshToken', {
+      type: 'http',
+      in: 'Header',
+      scheme: 'Bearer',
+      name: 'refreshToken',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

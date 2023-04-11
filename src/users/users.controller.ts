@@ -11,7 +11,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags, OmitType } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiTags,
+  OmitType,
+} from '@nestjs/swagger';
 import { isValidObjectId } from 'mongoose';
 import { Action, AppAbility } from 'src/ability/ability.factory';
 import { AbilityPipe } from 'src/ability/ability.pipe';
@@ -35,6 +40,7 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @ApiOkResponse({ type: PublicUser })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('/me')
   async me(@RequestUser() user: User): Promise<PublicUser> {
@@ -68,6 +74,7 @@ export class UsersController {
   }
 
   @ApiOkResponse({ type: PublicUser })
+  @ApiBearerAuth()
   @Delete(':id')
   @SetAndCheckPolicies(DeleteUserPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -82,6 +89,7 @@ export class UsersController {
   }
 
   @ApiOkResponse({ type: PublicUser })
+  @ApiBearerAuth()
   @Patch(':id')
   @SetAndCheckPolicies(UpdateUserPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -102,6 +110,7 @@ export class UsersController {
     return res;
   }
 
+  @ApiBearerAuth()
   @ApiOkResponse()
   @UseGuards(JwtAuthGuard)
   @Post('confirm-email')

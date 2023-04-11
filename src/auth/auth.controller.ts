@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+  ApiCookieAuth,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -79,6 +80,7 @@ export class AuthController {
 
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
+  @ApiCookieAuth()
   @Delete('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const { refreshToken } = req.cookies;
@@ -90,6 +92,7 @@ export class AuthController {
   }
 
   @ApiOkResponse({ type: AuthResponseDto })
+  @ApiCookieAuth()
   @Get('refresh')
   async refresh(
     @Req() req: Request,

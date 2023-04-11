@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
+  ApiBearerAuth,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiTags,
@@ -55,6 +56,7 @@ export class RecordsController {
   ) {}
 
   @ApiOkResponse({ type: Record })
+  @ApiBearerAuth()
   @Post()
   @SetAndCheckPolicies(CreateRecordPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -66,6 +68,7 @@ export class RecordsController {
   }
 
   @ApiOkResponse({ type: Photo })
+  @ApiBearerAuth()
   @Post('/:id/photos')
   @UseInterceptors(FileInterceptor('file', MulterImageOptions))
   @SetAndCheckPolicies(UpdateRecordPolicyHandler)
@@ -92,6 +95,7 @@ export class RecordsController {
   }
 
   @ApiOkResponse({ type: Photo })
+  @ApiBearerAuth()
   @Delete('/:recordId/photos/:photoId')
   @UseGuards(JwtAuthGuard)
   async deletePhoto(
@@ -134,6 +138,7 @@ export class RecordsController {
   }
 
   @ApiOkResponse({ type: Record })
+  @ApiBearerAuth()
   @Patch(':id')
   @SetAndCheckPolicies(UpdateRecordPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -154,6 +159,7 @@ export class RecordsController {
   }
 
   @ApiOkResponse({ type: Photo })
+  @ApiBearerAuth()
   @Patch(':recordId/photos/:photoId')
   @SetAndCheckPolicies(UpdateRecordPolicyHandler)
   @UseGuards(JwtAuthGuard)
@@ -178,6 +184,7 @@ export class RecordsController {
   @ApiOkResponse({
     type: Record,
   })
+  @ApiBearerAuth()
   @Delete(':id')
   @SetAndCheckPolicies(DeleteRecordPolicyHandler)
   @UseGuards(JwtAuthGuard)
