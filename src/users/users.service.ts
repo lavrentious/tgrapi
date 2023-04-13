@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as argon2 from 'argon2';
 import { Model, Types } from 'mongoose';
 import { RegisterDto } from 'src/auth/dto/register.dto';
+import { TokensService } from 'src/auth/tokens.service';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MailService } from './mail.service';
@@ -23,6 +24,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private readonly mailService: MailService,
+    private readonly tokensService: TokensService,
     @InjectModel(EmailConfirmation.name)
     private readonly emailConfirmationModel: Model<EmailConfirmationDocument>,
   ) {}
@@ -109,6 +111,7 @@ export class UsersService {
     }
     if (password) {
       user.password = await argon2.hash(password);
+      await this.tokensService.deleteByUserId(user._id);
     }
     if (username === null) user.username = undefined;
     else if (username !== undefined && user.username !== username) {

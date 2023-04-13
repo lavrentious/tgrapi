@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AbilityModule } from 'src/ability/ability.module';
+import { AuthModule } from 'src/auth/auth.module';
 import { MailService } from './mail.service';
 import { PasswordResetsModule } from './password-resets/password-resets.module';
 import {
@@ -21,6 +22,7 @@ import { UsersService } from './users.service';
     ]),
     AbilityModule,
     PasswordResetsModule,
+    forwardRef(() => AuthModule),
   ],
   providers: [ConfigService, UsersService, MailService],
   controllers: [UsersController],

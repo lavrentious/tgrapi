@@ -20,5 +20,6 @@ import { TokensService } from './tokens.service';
       { name: User.name, schema: UserSchema },
     ]),
   ],
+  exports: [TokensService],
 })
 export class AuthModule {}
