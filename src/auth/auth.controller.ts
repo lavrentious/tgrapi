@@ -91,6 +91,22 @@ export class AuthController {
     await this.authService.logout(refreshToken);
   }
 
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiCookieAuth()
+  @Delete('logout-all')
+  async logoutAll(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { refreshToken } = req.cookies;
+    if (!refreshToken) {
+      throw new UnauthorizedException('no refreshToken cookie present');
+    }
+    res.clearCookie('refreshToken');
+    await this.authService.logoutAll(refreshToken);
+  }
+
   @ApiOkResponse({ type: AuthResponseDto })
   @ApiCookieAuth()
   @Get('refresh')

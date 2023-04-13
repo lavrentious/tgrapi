@@ -75,6 +75,15 @@ export class TokensService {
     return this.tokenModel.findOne({ refreshToken });
   }
 
+  async deleteByUserId(userId: Types.ObjectId | string, refreshToken?: string) {
+    return this.tokenModel.deleteMany({
+      $and: [
+        { user: new Types.ObjectId(userId) },
+        { refreshToken: { $ne: refreshToken } },
+      ],
+    });
+  }
+
   validateAccessToken(accessToken: string): jwt.JwtPayload {
     try {
       const payload = jwt.verify(

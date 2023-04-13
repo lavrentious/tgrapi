@@ -76,6 +76,12 @@ export class AuthService {
     return this.tokenService.deleteRefreshToken(refreshToken);
   }
 
+  async logoutAll(refreshToken: string) {
+    const token = await this.tokenService.findRefreshToken(refreshToken);
+    if (!token) throw new UnauthorizedException();
+    return this.tokenService.deleteByUserId(token.user, refreshToken);
+  }
+
   async refresh(
     refreshToken: string,
     ipAddress: string,
