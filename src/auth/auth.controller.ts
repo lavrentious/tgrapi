@@ -95,15 +95,11 @@ export class AuthController {
   @ApiUnauthorizedResponse()
   @ApiCookieAuth()
   @Delete('logout-all')
-  async logoutAll(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async logoutAll(@Req() req: Request) {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
       throw new UnauthorizedException('no refreshToken cookie present');
     }
-    res.clearCookie('refreshToken');
     await this.authService.logoutAll(refreshToken);
   }
 
