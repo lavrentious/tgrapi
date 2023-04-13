@@ -38,4 +38,24 @@ export class MailService {
       `,
     });
   }
+
+  async sendPasswordResetEmail(
+    email: string,
+    key: string,
+  ): Promise<SMTPTransport.SentMessageInfo> {
+    const link = `${this.configService.get(
+      'CLIENT_URL',
+    )}/reset-password/${key}`;
+    return this.transporter.sendMail({
+      from: this.configService.get('SMTP_USER'),
+      to: email,
+      subject: 'Сброс пароля TifloGuide',
+      html: `
+        <div>
+          <h1>Перейдите по ссылке для сброса пароля</h1>
+          <a href="${link}">${link}</a>
+        </div>
+      `,
+    });
+  }
 }

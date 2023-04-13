@@ -47,6 +47,14 @@ export class UsersService {
     ]);
   }
 
+  async findByUsernameOrEmail(usernameOrEmail: string): Promise<User | null> {
+    return this.userModel
+      .findOne({
+        $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
+      })
+      .exec();
+  }
+
   async register(dto: RegisterDto): Promise<UserDocument> {
     if (await this.checkIsEmailTaken(dto.email)) {
       throw new HttpException('email taken', HttpStatus.BAD_REQUEST);
