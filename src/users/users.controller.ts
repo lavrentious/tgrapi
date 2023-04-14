@@ -9,6 +9,8 @@ import {
   Param,
   Patch,
   Post,
+  Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -17,6 +19,7 @@ import {
   ApiTags,
   OmitType,
 } from '@nestjs/swagger';
+import { Request } from 'express';
 import { isValidObjectId } from 'mongoose';
 import { Action, AppAbility } from 'src/ability/ability.factory';
 import { AbilityPipe } from 'src/ability/ability.pipe';
@@ -25,6 +28,7 @@ import { RequestUser } from 'src/auth/decorators/request-user.decorator';
 import { AnonymousJwtAuthGuard } from 'src/auth/guards/anonymous-jwt-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ParseObjectIdPipe } from 'src/common/pipes/parse-object-id.pipe';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserPolicyHandler } from './policies/delete-user.policy';
 import { UpdateUserPolicyHandler } from './policies/update-user.policy';
@@ -108,6 +112,27 @@ export class UsersController {
       await this.userService.updateOne(user, dto)
     ).toObject();
     return res;
+  }
+
+  @ApiBearerAuth()
+  @ApiOkResponse()
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/password')
+  async updatePassword(
+    @RequestUser(AbilityPipe) ability: AppAbility,
+    @Body() dto: UpdatePasswordDto,
+    @Param('id') id: string,
+    @Req() req: Request,
+  ): Promise<void> {
+    const { refreshToken } = req.cookies;
+    const user = await this.userService.findById(id);
+    if (!user) throw new NotFoundException();
+    ForbiddenError.from(ability).throwUnlessCan(
+      Action.UPDATE,
+      user,
+      'password',
+    );
+    await this.userService.updatePassword(user, dto, refreshToken);
   }
 
   @ApiBearerAuth()

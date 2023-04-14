@@ -17,13 +17,6 @@ export class UpdateUserDto extends PartialType(RegisterDto) {
   @ValidateIf((_, value) => value !== undefined)
   email?: string;
 
-  @Matches(rules.password.regexp)
-  @Length(rules.password.length.min, rules.password.length.max)
-  @IsString()
-  @IsDefined()
-  @ValidateIf((_, value) => value !== undefined)
-  password?: string;
-
   @IsString()
   @Length(rules.name.length.min, rules.name.length.max)
   @IsOptional()

@@ -11,6 +11,7 @@ import { Model, Types } from 'mongoose';
 import { RegisterDto } from 'src/auth/dto/register.dto';
 import { TokensService } from 'src/auth/tokens.service';
 import { v4 as uuidv4 } from 'uuid';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MailService } from './mail.service';
 import {
@@ -99,7 +100,7 @@ export class UsersService {
     user: UserDocument,
     dto: UpdateUserDto,
   ): Promise<UserDocument> {
-    const { email, password, username, name } = dto;
+    const { email, username, name } = dto;
     if (email && user.email !== email) {
       const candidate = await this.checkIsEmailTaken(email);
       if (candidate) {
@@ -108,10 +109,6 @@ export class UsersService {
       user.email = email;
       user.emailConfirmed = false;
       this.saveEmailConfirmation(user._id, email);
-    }
-    if (password) {
-      user.password = await argon2.hash(password);
-      await this.tokensService.deleteByUserId(user._id);
     }
     if (username === null) user.username = undefined;
     else if (username !== undefined && user.username !== username) {
@@ -160,6 +157,21 @@ export class UsersService {
       throw new NotFoundException();
     }
     return user.deleteOne().select('-__v -password').exec();
+  }
+
+  async updatePassword(
+    user: UserDocument,
+    dto: UpdatePasswordDto,
+    refreshToken?: string,
+  ) {
+    const { oldPassword, newPassword, logout } = dto;
+    const passwordOk = await argon2.verify(user.password, oldPassword);
+    if (!passwordOk) throw new BadRequestException('incorrect password');
+    user.password = await argon2.hash(newPassword);
+    if (logout) {
+      await this.tokensService.deleteByUserId(user._id, refreshToken);
+    }
+    return user.save({ timestamps: false });
   }
 
   private async checkIsEmailTaken(
