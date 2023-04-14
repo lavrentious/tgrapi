@@ -93,6 +93,7 @@ export class AuthService {
       throw new UnauthorizedException('invalid token');
     }
     const user = await this.userService.findById(decoded.userId);
+    if (!user) throw new UnauthorizedException();
     const payload = new PayloadDto(user);
     const tokens = this.tokenService.generateTokens(payload);
 
