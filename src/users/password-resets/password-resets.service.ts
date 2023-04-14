@@ -50,6 +50,6 @@ export class PasswordResetsService {
     const doc = await this.check(key);
     const user = await this.userService.findById(doc.user);
     await doc.deleteOne();
-    return this.userService.updateOne(user, { password });
+    return this.userService.setPassword(user, password, undefined, true);
   }
 }

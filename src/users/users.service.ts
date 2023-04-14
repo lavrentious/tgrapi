@@ -159,6 +159,19 @@ export class UsersService {
     return user.deleteOne().select('-__v -password').exec();
   }
 
+  async setPassword(
+    user: UserDocument,
+    password: string,
+    refreshToken?: string,
+    logout?: boolean,
+  ) {
+    user.password = await argon2.hash(password);
+    if (logout) {
+      await this.tokensService.deleteByUserId(user._id, refreshToken);
+    }
+    return user.save({ timestamps: false });
+  }
+
   async updatePassword(
     user: UserDocument,
     dto: UpdatePasswordDto,
@@ -167,11 +180,7 @@ export class UsersService {
     const { oldPassword, newPassword, logout } = dto;
     const passwordOk = await argon2.verify(user.password, oldPassword);
     if (!passwordOk) throw new BadRequestException('incorrect password');
-    user.password = await argon2.hash(newPassword);
-    if (logout) {
-      await this.tokensService.deleteByUserId(user._id, refreshToken);
-    }
-    return user.save({ timestamps: false });
+    return this.setPassword(user, newPassword, refreshToken, logout);
   }
 
   private async checkIsEmailTaken(
