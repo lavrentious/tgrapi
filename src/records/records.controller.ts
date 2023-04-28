@@ -116,7 +116,7 @@ export class RecordsController {
     return photoResult;
   }
 
-  @ApiOkResponse({ type: [Record] })
+  @ApiOkResponse({ type: [FindAllResultDto] })
   @Get()
   @UseGuards(AnonymousJwtAuthGuard)
   async findAll(
