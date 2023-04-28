@@ -92,6 +92,28 @@ export class Record {
   @ApiProperty()
   @Prop({ required: false })
   updatedAt: Date;
+
+  @Prop({
+    type: [Number],
+    required: true,
+  })
+  _location: [number, number];
 }
 
 export const RecordSchema = SchemaFactory.createForClass(Record);
+RecordSchema.pre('save', { query: true, document: true }, function (next) {
+  this._location = [this.lon, this.lat];
+  return next();
+});
+RecordSchema.pre('updateOne', function (next) {
+  const update: mongoose.UpdateQuery<Record> = this.getUpdate();
+  if (!update['$set']) update['$set'] = {};
+  if (update.lon != null) {
+    update['$set']['_location.0'] = update.lon;
+  }
+  if (update.lat != null) {
+    update['$set']['_location.1'] = update.lat;
+  }
+  return next();
+});
+RecordSchema.index({ _location: '2dsphere' });

@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, PipelineStage, Types } from 'mongoose';
 import { escapeRegExp } from 'src/common/utils/escape-regexp';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { FindAllResultDto } from './dto/find-all-result.dto';
@@ -38,6 +38,7 @@ export class RecordsService {
       address: {
         ...address,
       },
+      _location: [dto.lon, dto.lat],
       author: new Types.ObjectId(authorId),
     });
   }
@@ -45,7 +46,35 @@ export class RecordsService {
   async findAll(params: FindRecordsQueryParams): Promise<FindAllResultDto[]> {
     // TODO: @casl/mongoose AccessibleRecords plugin
     const { userLat, userLon, radius, search } = params;
-    const query = this.recordModel.find();
+    const aggregation = [{ $match: {} }] as PipelineStage[];
+    if (userLat != null && userLon != null) {
+      aggregation.push(
+        {
+          $geoNear: {
+            near: {
+              type: 'Point',
+              coordinates: [userLon, userLat],
+            },
+            distanceField: 'distance',
+            maxDistance: radius ?? CLOSEST_RADIUS,
+            spherical: true,
+            key: '_location',
+          },
+        },
+        {
+          $addFields: {
+            azimuth: {
+              $radiansToDegrees: {
+                $atan2: [
+                  { $subtract: ['$lon', userLon] },
+                  { $subtract: ['$lat', userLat] },
+                ],
+              },
+            },
+          },
+        },
+      );
+    }
     if (search) {
       const regexp = new RegExp(
         search
@@ -56,29 +85,14 @@ export class RecordsService {
           .join('') + '.+',
         'gi',
       );
-      console.log(regexp);
-      query.find({
-        $or: [{ name: regexp }, { 'address.displayName': regexp }],
+      aggregation.push({
+        $match: {
+          $or: [{ name: regexp }, { 'address.displayName': regexp }],
+        },
       });
     }
-    let result: FindAllResultDto[] = (await query
-      .select('-__v')
-      .lean()) as FindAllResultDto[];
-    if (userLat != null && userLon != null) {
-      result = result.map((r) => {
-        const azimuth = this.geoService.azimuth(userLat, userLon, r.lat, r.lon);
-        const direction = this.geoService.getDirection(azimuth);
-        const distance = this.geoService.haversine(
-          userLat,
-          userLon,
-          r.lat,
-          r.lon,
-        );
-        return { ...r, distance, azimuth, direction } as FindAllResultDto;
-      });
-      result = result.filter((r) => r.distance <= (radius || CLOSEST_RADIUS));
-    }
-    return result;
+    console.log(aggregation);
+    return this.recordModel.aggregate(aggregation).exec();
   }
 
   async findById(
@@ -117,7 +131,7 @@ export class RecordsService {
         (id) => !newPhotos.has(id.toString()),
       );
       const deletionResult = this.photosService.deleteMany(unusedPhotos);
-      await Promise.all([record.updateOne(dto), deletionResult]);
+      await Promise.all([record.updateOne(dto), deletionResult]); // FIXME: ???
     }
     if (dto.autoAddress) {
       const address = await this.geoService.addressByCoords(
@@ -132,7 +146,10 @@ export class RecordsService {
         query['address.' + key] = dto.address[key];
       }
     }
-    return this.recordModel.findByIdAndUpdate(record, query, { new: true });
+    if (dto.lat !== record.lat || dto.lon !== record.lon) {
+      query['location.coordinates'] = [dto.lon, dto.lat];
+    }
+    return record.updateOne(query, { new: true });
   }
 
   async deleteOne(record: RecordDocument): Promise<{

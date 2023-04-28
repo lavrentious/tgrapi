@@ -76,21 +76,4 @@ export class GeoService {
     const r = Math.atan2(lng2 - lng1, lat2 - lat1) / 0.017453292519943295;
     return r >= 0 ? r : r + 360;
   }
-  /**
-   * @returns lowercase direction from first to second point
-   */
-  getDirection(azimuth: number): string {
-    let i = Math.floor(azimuth / 45);
-    if (azimuth % 45 >= 27.5) i += 1;
-    return [
-      'север',
-      'северо-восток',
-      'восток',
-      'юго-восток',
-      'юг',
-      'юго-запад',
-      'запад',
-      'северо-запад',
-    ][i % 8];
-  }
 }
