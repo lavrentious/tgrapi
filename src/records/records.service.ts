@@ -131,8 +131,7 @@ export class RecordsService {
       const unusedPhotos = record.photos.filter(
         (id) => !newPhotos.has(id.toString()),
       );
-      const deletionResult = this.photosService.deleteMany(unusedPhotos);
-      await Promise.all([record.updateOne(dto), deletionResult]); // FIXME: ???
+      await this.photosService.deleteMany(unusedPhotos);
     }
     if (dto.autoAddress) {
       const address = await this.geoService.addressByCoords(
