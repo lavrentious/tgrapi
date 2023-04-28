@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage, Types } from 'mongoose';
+import { AggregatePaginateModel, Model, PipelineStage, Types } from 'mongoose';
 import { escapeRegExp } from 'src/common/utils/escape-regexp';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { FindAllResultDto } from './dto/find-all-result.dto';
@@ -17,7 +17,7 @@ export const CLOSEST_RADIUS = 300;
 export class RecordsService {
   constructor(
     @InjectModel(Record.name)
-    private readonly recordModel: Model<RecordDocument>,
+    private readonly recordModel: AggregatePaginateModel<RecordDocument>,
     @InjectModel(Photo.name)
     private readonly photoModel: Model<PhotoDocument>,
     @Inject(forwardRef(() => PhotosService))
@@ -43,9 +43,9 @@ export class RecordsService {
     });
   }
 
-  async findAll(params: FindRecordsQueryParams): Promise<FindAllResultDto[]> {
+  async findAll(params: FindRecordsQueryParams): Promise<FindAllResultDto> {
     // TODO: @casl/mongoose AccessibleRecords plugin
-    const { userLat, userLon, radius, search } = params;
+    const { userLat, userLon, radius, search, ...paginateOptions } = params;
     const aggregation = [] as PipelineStage[];
     if (userLat != null && userLon != null) {
       aggregation.push(
@@ -92,8 +92,10 @@ export class RecordsService {
       });
     }
     if (!aggregation.length) aggregation.push({ $match: {} });
-    console.log(aggregation);
-    return this.recordModel.aggregate(aggregation).exec();
+    return this.recordModel.aggregatePaginate(
+      this.recordModel.aggregate(aggregation),
+      paginateOptions,
+    );
   }
 
   async findById(

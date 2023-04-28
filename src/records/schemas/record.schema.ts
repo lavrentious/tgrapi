@@ -3,6 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 import * as mongoose from 'mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { User } from 'src/users/schemas/user.schema';
 
 export const MAX_PHOTOS = 5;
@@ -100,7 +101,7 @@ export class Record {
   _location: [number, number];
 }
 
-export const RecordSchema = SchemaFactory.createForClass(Record);
+const RecordSchema = SchemaFactory.createForClass(Record);
 RecordSchema.pre('save', { query: true, document: true }, function (next) {
   this._location = [this.lon, this.lat];
   return next();
@@ -117,3 +118,5 @@ RecordSchema.pre('updateOne', function (next) {
   return next();
 });
 RecordSchema.index({ _location: '2dsphere' });
+RecordSchema.plugin(mongooseAggregatePaginate);
+export { RecordSchema };

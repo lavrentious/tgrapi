@@ -7,9 +7,10 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { PaginateParams } from 'src/common/dto/paginate-params.dto';
 import { CLOSEST_RADIUS } from 'src/records/records.service';
 
-export class FindRecordsQueryParams {
+export class FindRecordsQueryParams extends PaginateParams {
   @ApiPropertyOptional({ minimum: -90, maximum: 90 })
   @IsOptional()
   @IsLatitude()

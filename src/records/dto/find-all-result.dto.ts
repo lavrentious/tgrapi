@@ -1,13 +1,8 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Record } from '../schemas/record.schema';
+import { ApiProperty } from '@nestjs/swagger';
+import { PaginateResultMeta } from 'src/common/dto/paginate-result-meta.dto';
+import { FindAllRecord } from './find-all-record.dto';
 
-export class FindAllResultDto extends Record {
-  @ApiPropertyOptional()
-  distance?: number;
-
-  @ApiPropertyOptional()
-  direction?: string;
-
-  @ApiPropertyOptional()
-  azimuth?: number;
+export class FindAllResultDto extends PaginateResultMeta {
+  @ApiProperty({ type: [FindAllRecord] })
+  docs: FindAllRecord[];
 }

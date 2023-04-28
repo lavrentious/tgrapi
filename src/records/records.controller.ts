@@ -116,12 +116,12 @@ export class RecordsController {
     return photoResult;
   }
 
-  @ApiOkResponse({ type: [FindAllResultDto] })
+  @ApiOkResponse({ type: FindAllResultDto })
   @Get()
   @UseGuards(AnonymousJwtAuthGuard)
   async findAll(
     @Query() params: FindRecordsQueryParams,
-  ): Promise<FindAllResultDto[]> {
+  ): Promise<FindAllResultDto> {
     return this.recordsService.findAll(params);
   }
 
