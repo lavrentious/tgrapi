@@ -46,7 +46,7 @@ export class RecordsService {
   async findAll(params: FindRecordsQueryParams): Promise<FindAllResultDto[]> {
     // TODO: @casl/mongoose AccessibleRecords plugin
     const { userLat, userLon, radius, search } = params;
-    const aggregation = [{ $match: {} }] as PipelineStage[];
+    const aggregation = [] as PipelineStage[];
     if (userLat != null && userLon != null) {
       aggregation.push(
         {
@@ -91,6 +91,7 @@ export class RecordsService {
         },
       });
     }
+    if (!aggregation.length) aggregation.push({ $match: {} });
     console.log(aggregation);
     return this.recordModel.aggregate(aggregation).exec();
   }
