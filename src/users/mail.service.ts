@@ -11,7 +11,8 @@ export class MailService {
     private readonly configService: ConfigService<EnvironmentVariables>,
   ) {
     this.transporter = nodemailer.createTransport({
-      service: 'Yandex',
+      host: this.configService.get('SMTP_SERVER'),
+      port: this.configService.get('SMTP_PORT'),
       auth: {
         user: this.configService.get('SMTP_USER'),
         pass: this.configService.get('SMTP_PASS'),

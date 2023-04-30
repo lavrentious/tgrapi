@@ -1,5 +1,11 @@
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsNumber, IsString, validateSync } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsPort,
+  IsString,
+  validateSync,
+} from 'class-validator';
 
 export enum Environment {
   DEVELOPMENT = 'development',
@@ -27,6 +33,12 @@ export class EnvironmentVariables {
 
   @IsString()
   SMTP_PASS: string;
+
+  @IsString()
+  SMTP_SERVER: string;
+
+  @IsPort()
+  SMTP_PORT: string;
 
   @IsString()
   API_URL: string;
