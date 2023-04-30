@@ -5,7 +5,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { Request } from 'express';
 import morgan from 'morgan';
-import { version } from '../package.json';
 import { AppModule } from './app.module';
 import { ForbiddenErrorFilter } from './common/filters/forbidden-error.filter';
 import { EnvironmentVariables } from './env.validation';
@@ -32,7 +31,6 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('TGR API')
     .setDescription('The TGR API description')
-    .setVersion(version)
     .addBearerAuth({
       type: 'http',
       name: 'Authorization',
