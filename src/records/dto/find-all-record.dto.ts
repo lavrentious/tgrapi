@@ -6,8 +6,5 @@ export class FindAllRecord extends Record {
   distance?: number;
 
   @ApiPropertyOptional()
-  direction?: string;
-
-  @ApiPropertyOptional()
   azimuth?: number;
 }
