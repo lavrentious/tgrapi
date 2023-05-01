@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AggregatePaginateModel, Model, PipelineStage, Types } from 'mongoose';
-import { escapeRegExp } from 'src/common/utils/escape-regexp';
+import { searchRegexp } from 'src/common/utils/search-regexp';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { FindAllResultDto } from './dto/find-all-result.dto';
 import { FindRecordsQueryParams } from './dto/find-records-query-params.dto';
@@ -80,15 +80,7 @@ export class RecordsService {
       aggregation.push({ $match: { author: new Types.ObjectId(author) } });
     }
     if (search) {
-      const regexp = new RegExp(
-        search
-          .trim()
-          .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '')
-          .split(/\s+/)
-          .map((w) => `(?=.*${escapeRegExp(w)})`)
-          .join('') + '.+',
-        'gi',
-      );
+      const regexp = searchRegexp(search);
       aggregation.push({
         $match: {
           $or: [{ name: regexp }, { 'address.displayName': regexp }],
