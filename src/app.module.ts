@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AbilityModule } from './ability/ability.module';
+import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { EnvironmentVariables, validate } from './env.validation';
@@ -33,7 +34,7 @@ import { UsersModule } from './users/users.module';
     RecordsModule,
     CloudinaryModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}
