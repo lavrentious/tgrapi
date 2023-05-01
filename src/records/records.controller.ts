@@ -44,6 +44,7 @@ import { DeleteRecordPolicyHandler } from './policies/delete-record.policy';
 import { RecordsService } from './records.service';
 import { Photo } from './schemas/photo.schema';
 import { Record } from './schemas/record.schema';
+import { PopulatedRecord } from './types/populated-record';
 
 @ApiForbiddenResponse()
 @ApiUnauthorizedResponse()
@@ -125,7 +126,7 @@ export class RecordsController {
     return this.recordsService.findAll(params);
   }
 
-  @ApiOkResponse({ type: Record })
+  @ApiOkResponse({ type: PopulatedRecord })
   @Get(':id')
   async findOne(
     @Param('id', new ParseObjectIdPipe()) id: string,
