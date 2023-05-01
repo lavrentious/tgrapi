@@ -7,10 +7,13 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as argon2 from 'argon2';
-import { Model, Types } from 'mongoose';
+import { AggregatePaginateModel, Model, PipelineStage, Types } from 'mongoose';
 import { RegisterDto } from 'src/auth/dto/register.dto';
 import { TokensService } from 'src/auth/tokens.service';
+import { searchRegexp } from 'src/common/utils/search-regexp';
 import { v4 as uuidv4 } from 'uuid';
+import { FindUsersQueryParams } from './dto/find-all-users-params.dto';
+import { FindAllUsersResultDto } from './dto/find-all-users-result.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MailService } from './mail.service';
@@ -23,7 +26,8 @@ import { User, UserDocument } from './schemas/user.schema';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(User.name)
+    private readonly userModel: AggregatePaginateModel<UserDocument>,
     private readonly mailService: MailService,
     private readonly tokensService: TokensService,
     @InjectModel(EmailConfirmation.name)
@@ -74,8 +78,31 @@ export class UsersService {
     return user;
   }
 
-  async findAll(fields?: string): Promise<UserDocument[]> {
-    return this.userModel.find().select(fields).exec();
+  async findAll(
+    params: FindUsersQueryParams,
+    fields?: string,
+  ): Promise<FindAllUsersResultDto> {
+    const { search, ...paginateOptions } = params;
+    const aggregation = [] as PipelineStage[];
+
+    if (search) {
+      const regexp = searchRegexp(search);
+      aggregation.push({
+        $match: {
+          $or: [{ name: regexp }, { username: regexp }],
+        },
+      });
+    }
+
+    if (fields) {
+      aggregation.push({ $project: { password: 0, __v: 0 } });
+    }
+
+    if (!aggregation.length) aggregation.push({ $match: {} });
+    return this.userModel.aggregatePaginate(
+      this.userModel.aggregate(aggregation),
+      paginateOptions,
+    );
   }
 
   async findByEmail(email: string): Promise<UserDocument> {

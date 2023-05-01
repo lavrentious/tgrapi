@@ -33,7 +33,7 @@ import { CreateRecordPolicyHandler } from 'src/records/policies/create-record.po
 import { UpdateRecordPolicyHandler } from 'src/records/policies/update-record.policy';
 import { User } from 'src/users/schemas/user.schema';
 import { CreateRecordDto } from './dto/create-record.dto';
-import { FindAllResultDto } from './dto/find-all-result.dto';
+import { FindAllRecordsResultDto } from './dto/find-all-records-result.dto';
 import { FindRecordsQueryParams } from './dto/find-records-query-params.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
@@ -117,12 +117,12 @@ export class RecordsController {
     return photoResult;
   }
 
-  @ApiOkResponse({ type: FindAllResultDto })
+  @ApiOkResponse({ type: FindAllRecordsResultDto })
   @Get()
   @UseGuards(AnonymousJwtAuthGuard)
   async findAll(
     @Query() params: FindRecordsQueryParams,
-  ): Promise<FindAllResultDto> {
+  ): Promise<FindAllRecordsResultDto> {
     return this.recordsService.findAll(params);
   }
 

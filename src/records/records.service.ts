@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AggregatePaginateModel, Model, PipelineStage, Types } from 'mongoose';
 import { searchRegexp } from 'src/common/utils/search-regexp';
 import { CreateRecordDto } from './dto/create-record.dto';
-import { FindAllResultDto } from './dto/find-all-result.dto';
+import { FindAllRecordsResultDto } from './dto/find-all-records-result.dto';
 import { FindRecordsQueryParams } from './dto/find-records-query-params.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { GeoService } from './geo.service';
@@ -43,7 +43,9 @@ export class RecordsService {
     });
   }
 
-  async findAll(params: FindRecordsQueryParams): Promise<FindAllResultDto> {
+  async findAll(
+    params: FindRecordsQueryParams,
+  ): Promise<FindAllRecordsResultDto> {
     // TODO: @casl/mongoose AccessibleRecords plugin
     const { userLat, userLon, radius, search, author, ...paginateOptions } =
       params;

@@ -10,15 +10,11 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOkResponse,
-  ApiTags,
-  OmitType,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { isValidObjectId } from 'mongoose';
 import { Action, AppAbility } from 'src/ability/ability.factory';
@@ -28,15 +24,15 @@ import { RequestUser } from 'src/auth/decorators/request-user.decorator';
 import { AnonymousJwtAuthGuard } from 'src/auth/guards/anonymous-jwt-auth.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ParseObjectIdPipe } from 'src/common/pipes/parse-object-id.pipe';
+import { FindUsersQueryParams } from './dto/find-all-users-params.dto';
+import { FindAllUsersResultDto } from './dto/find-all-users-result.dto';
+import { PublicUser } from './dto/public-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserPolicyHandler } from './policies/delete-user.policy';
 import { UpdateUserPolicyHandler } from './policies/update-user.policy';
 import { User } from './schemas/user.schema';
 import { UsersService } from './users.service';
-
-// TODO: optional values based on ability
-class PublicUser extends OmitType(User, ['password']) {}
 
 @ApiTags('users')
 @Controller('users')
@@ -71,10 +67,12 @@ export class UsersController {
     return res;
   }
 
-  @ApiOkResponse({ type: [PublicUser] })
+  @ApiOkResponse({ type: FindAllUsersResultDto })
   @Get()
-  async getAll(): Promise<PublicUser[]> {
-    return this.userService.findAll('-__v -password');
+  async getAll(
+    @Query() params: FindUsersQueryParams,
+  ): Promise<FindAllUsersResultDto> {
+    return this.userService.findAll(params, '-__v -password');
   }
 
   @ApiOkResponse({ type: PublicUser })
