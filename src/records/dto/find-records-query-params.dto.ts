@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import {
   IsLatitude,
   IsLongitude,
+  IsMongoId,
   IsNumber,
   IsOptional,
   IsString,
@@ -38,4 +39,8 @@ export class FindRecordsQueryParams extends PaginateParams {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @IsMongoId()
+  @IsOptional()
+  author?: string;
 }
