@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNumber,
   IsPort,
+  IsSemVer,
   IsString,
   validateSync,
 } from 'class-validator';
@@ -15,6 +16,13 @@ export enum Environment {
 export class EnvironmentVariables {
   @IsEnum(Environment)
   NODE_ENV: Environment;
+
+  @IsSemVer()
+  @IsString()
+  VERSION: Environment;
+
+  @IsString()
+  LAST_COMMIT_DATE: Environment;
 
   @IsNumber()
   PORT: number;

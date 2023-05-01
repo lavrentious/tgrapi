@@ -31,6 +31,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('TGR API')
     .setDescription('The TGR API description')
+    .setVersion(configService.get('VERSION'))
     .addBearerAuth({
       type: 'http',
       name: 'Authorization',
