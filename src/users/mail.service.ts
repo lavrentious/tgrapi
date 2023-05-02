@@ -30,7 +30,7 @@ export class MailService {
     return this.transporter.sendMail({
       from: this.configService.get('SMTP_USER'),
       to: email,
-      subject: 'Account activation on ' + this.configService.get('API_URL'),
+      subject: 'Активация аккаунта TifloGuide',
       html: `
         <div>
           <h1>Activate your account</h1>
