@@ -89,7 +89,7 @@ export class RecordsService {
         },
       });
     }
-    if (!aggregation.length) aggregation.push({ $match: {} });
+    aggregation.push({ $sort: { updatedAt: -1 } });
     return this.recordModel.aggregatePaginate(
       this.recordModel.aggregate(aggregation),
       paginateOptions,
