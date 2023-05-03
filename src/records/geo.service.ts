@@ -47,7 +47,8 @@ export class GeoService {
 
   getDisplayName(address: Address): string | null {
     return (
-      [address.region, address.city, address.street, address.house]
+      // TODO: mongoose virtual by default
+      [address.street, address.house, address.city, address.region]
         .filter((e) => e != null)
         .join(', ') || null
     );
