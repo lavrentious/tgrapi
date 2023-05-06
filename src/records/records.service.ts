@@ -50,7 +50,8 @@ export class RecordsService {
     const { userLat, userLon, radius, search, author, ...paginateOptions } =
       params;
     const aggregation = [] as PipelineStage[];
-    if (userLat != null && userLon != null) {
+    const closestMode = userLat != null && userLon != null;
+    if (closestMode) {
       aggregation.push(
         {
           $geoNear: {
@@ -76,6 +77,7 @@ export class RecordsService {
             },
           },
         },
+        { $sort: { distance: 1 } },
       );
     }
     if (author) {
@@ -89,7 +91,7 @@ export class RecordsService {
         },
       });
     }
-    aggregation.push({ $sort: { updatedAt: -1 } });
+    if (!closestMode) aggregation.push({ $sort: { updatedAt: -1 } });
     return this.recordModel.aggregatePaginate(
       this.recordModel.aggregate(aggregation),
       paginateOptions,
