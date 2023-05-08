@@ -92,6 +92,7 @@ export class RecordsService {
       });
     }
     if (!closestMode) aggregation.push({ $sort: { updatedAt: -1 } });
+    aggregation.push({ $project: { _location: 0, __v: 0 } });
     return this.recordModel.aggregatePaginate(
       this.recordModel.aggregate(aggregation),
       paginateOptions,
@@ -110,7 +111,7 @@ export class RecordsService {
         this.photoModel,
       );
     }
-    return q;
+    return q.select('-__v -_location').exec();
   }
 
   async removePhoto(
