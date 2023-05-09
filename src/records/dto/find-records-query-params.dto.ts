@@ -6,6 +6,7 @@ import {
   IsMongoId,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
 } from 'class-validator';
 import { PaginateParams } from 'src/common/dto/paginate-params.dto';
@@ -29,6 +30,7 @@ export class FindRecordsQueryParams extends PaginateParams {
     description: 'radius in metres',
   })
   @IsOptional()
+  @IsPositive()
   @IsNumber()
   @Type(() => Number)
   radius?: number;
