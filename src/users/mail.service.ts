@@ -33,7 +33,7 @@ export class MailService {
       subject: 'Активация аккаунта TifloGuide',
       html: `
         <div>
-          <h1>Activate your account</h1>
+          <h1>Перейдите по ссылке для подтверждения учётной записи</h1>
           <a href="${link}">${link}</a>
         </div>
       `,
