@@ -5,6 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import { Model, Query, Types } from 'mongoose';
 import { EnvironmentVariables } from 'src/env.validation';
 import { PayloadDto } from './dto/payload.dto';
+import { DeleteResult } from 'mongodb';
 import {
   ACCESS_TOKEN_LIFESPAN,
   REFRESH_TOKEN_LIFESPAN,
@@ -75,7 +76,10 @@ export class TokensService {
     return this.tokenModel.findOne({ refreshToken });
   }
 
-  async deleteByUserId(userId: Types.ObjectId | string, refreshToken?: string) {
+  async deleteByUserId(
+    userId: Types.ObjectId | string,
+    refreshToken?: string,
+  ): Promise<DeleteResult> {
     return this.tokenModel.deleteMany({
       $and: [
         { user: new Types.ObjectId(userId) },

@@ -183,7 +183,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException();
     }
-    return user.deleteOne().select('-__v -password').exec();
+    return user.deleteOne({ fields: '-password' });
   }
 
   async setPassword(
