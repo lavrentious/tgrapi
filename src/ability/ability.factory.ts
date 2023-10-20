@@ -34,16 +34,17 @@ export class AbilityFactory {
       | InferSubjects<typeof this.userModel>
       | InferSubjects<typeof this.recordModel>
       | 'all';
-    const { can, build } = new AbilityBuilder(
+    const { can, cannot, build } = new AbilityBuilder(
       Ability as AbilityClass<Ability<[Action, Subjects]>>,
     );
 
     const defineForAnon = () => {
       can(Action.READ, this.recordModel);
-      can(Action.READ, this.userModel, ['username', 'name', 'role']);
+      can(Action.READ, this.userModel, ['_id', 'username', 'role']);
     };
     const defineForUser = () => {
       can(Action.READ, this.userModel, { _id: user._id });
+      cannot(Action.READ, this.userModel, ['password']);
       can(
         Action.UPDATE,
         this.userModel,
@@ -52,10 +53,6 @@ export class AbilityFactory {
           _id: user._id,
         },
       );
-      if (user.emailConfirmed) {
-        // can(Action.CREATE, 'VerificationRequest');
-        // can([Action.DELETE, Action.READ], 'VerificationRequest', { userId: user._id });
-      }
     };
     const defineForVerified = () => {
       can(Action.CREATE, this.recordModel);
@@ -77,13 +74,17 @@ export class AbilityFactory {
           author: user._id,
         },
       );
-      can(Action.READ, this.userModel, ['createdAt']);
+      can(Action.READ, this.userModel, [
+        'name',
+        'email',
+        'emailConfirmed',
+        'createdAt',
+      ]);
       // cannot(Action.CREATE, 'VerificationRequest');
     };
     const defineForModerator = () => {
-      can(Action.READ, this.userModel);
+      can(Action.READ, this.userModel, ['updatedAt']);
       can(Action.UPDATE, this.userModel, ['role'], { role: Role.USER });
-      // can([Action.READ, Action.DELETE], 'VerificationRequest');
     };
     const defineForAdmin = () => {
       can(Action.MANAGE, 'all');

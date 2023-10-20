@@ -80,8 +80,7 @@ export class UsersService {
 
   async findAll(
     params: FindUsersQueryParams,
-    fields?: string,
-  ): Promise<FindAllUsersResultDto> {
+  ): Promise<FindAllUsersResultDto & { docs: UserDocument[] }> {
     const { search, ...paginateOptions } = params;
     const aggregation = [] as PipelineStage[];
 
@@ -94,33 +93,38 @@ export class UsersService {
       });
     }
 
-    if (fields) {
-      aggregation.push({ $project: { password: 0, __v: 0 } });
-    }
+    aggregation.push({ $project: { password: 0, __v: 0 } });
 
     if (!aggregation.length) aggregation.push({ $match: {} });
-    return this.userModel.aggregatePaginate(
+    const res = await this.userModel.aggregatePaginate(
       this.userModel.aggregate(aggregation),
       paginateOptions,
     );
+
+    // uhhhh
+    // to turn docs into actual HydratedDocuments to check with ability in controller
+    const users = await Promise.all(
+      res.docs.map(
+        async (user: User) => await this.userModel.findById(user._id),
+      ),
+    );
+
+    return {
+      ...res,
+      docs: users,
+    };
   }
 
   async findByEmail(email: string): Promise<UserDocument> {
     return this.userModel.findOne({ email }).exec();
   }
 
-  async findByUsername(
-    username: string,
-    fields?: string,
-  ): Promise<UserDocument> {
-    return this.userModel.findOne({ username }).select(fields).exec();
+  async findByUsername(username: string): Promise<UserDocument> {
+    return this.userModel.findOne({ username }).exec();
   }
 
-  async findById(
-    id: Types.ObjectId | string,
-    fields?: string,
-  ): Promise<UserDocument | null> {
-    return this.userModel.findById(id).select(fields).exec();
+  async findById(id: Types.ObjectId | string): Promise<UserDocument | null> {
+    return this.userModel.findById(id).exec();
   }
 
   async updateOne(
