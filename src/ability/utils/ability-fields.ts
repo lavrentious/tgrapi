@@ -1,32 +1,15 @@
-import { AnyAbility, RuleOf } from '@casl/ability';
-import { Rule } from '@casl/ability/dist/types/Rule';
+import { AnyAbility } from '@casl/ability';
+import { permittedFieldsOf } from '@casl/ability/extra';
 
-export type GetRuleFields<R extends Rule<any, any>> = (rule: R) => string[];
+import { Action } from '../ability.factory';
 
-export interface PermittedFieldsOptions<T extends AnyAbility> {
-  fieldsFrom: GetRuleFields<RuleOf<T>>;
-}
-
-export function permittedFieldsOf<T extends AnyAbility>(
+export function getAllowedFields<T extends AnyAbility>(
   ability: T,
-  action: Parameters<T['can']>[0],
+  action: Action,
   subject: Parameters<T['can']>[1],
-  options: PermittedFieldsOptions<T>,
-): string[] {
-  const subjectType = ability.detectSubjectType(subject);
-  const rules = ability.possibleRulesFor(action, subjectType);
-  const uniqueFields = new Set<string>();
-  const deleteItem = uniqueFields.delete.bind(uniqueFields);
-  const addItem = uniqueFields.add.bind(uniqueFields);
-  let i = rules.length;
-
-  while (i--) {
-    const rule = rules[i];
-    if (rule.matchesConditions(subject)) {
-      const toggle = rule.inverted ? deleteItem : addItem;
-      options.fieldsFrom(rule).forEach(toggle);
-    }
-  }
-
-  return Array.from(uniqueFields);
+): (keyof Parameters<T['can']>[1])[] {
+  return permittedFieldsOf(ability, action, subject, {
+    fieldsFrom: (rule) =>
+      rule.fields || Object.getOwnPropertyNames(subject.toObject()),
+  });
 }
