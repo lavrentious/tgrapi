@@ -4,7 +4,7 @@ export const username = {
 };
 
 export const password = {
-  regexp: /^[\w[!"#$%&'()*+,-./:;<=>?@]*$/,
+  regexp: /^[\w\^[!"#$%&'()*+,\-./:;<=>?@]*$/,
   length: { min: 8, max: 256 },
 };
 
