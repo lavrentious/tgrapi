@@ -7,6 +7,7 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -15,6 +16,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { hours, Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Request, Response } from 'express';
 import { IpAddress } from 'src/common/decorators/ip-address.decorator';
 import { UserAgent } from 'src/common/decorators/user-agent.decorator';
@@ -48,6 +50,8 @@ export class AuthController {
   }
 
   @ApiOkResponse({ type: AuthResponseDto })
+  @Throttle({ default: { limit: 3, ttl: hours(24) } }) // 3 per 24 hours
+  @UseGuards(ThrottlerGuard)
   @Post('register')
   async register(
     @Body() dto: RegisterDto,

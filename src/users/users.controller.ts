@@ -15,6 +15,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { hours, Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Request } from 'express';
 import { isValidObjectId } from 'mongoose';
 import { Action, AppAbility } from 'src/ability/ability.factory';
@@ -160,7 +161,8 @@ export class UsersController {
 
   @ApiBearerAuth()
   @ApiOkResponse()
-  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 3, ttl: hours(24) } }) // 3 per 24 hours
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
   @Post('confirm-email')
   async resendEmailConfirmation(@RequestUser() user: User): Promise<void> {
     return this.userService.resendEmailConfirmation(user);
