@@ -1,6 +1,12 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { AggregatePaginateModel, Model, PipelineStage, Types } from 'mongoose';
+import {
+  AggregatePaginateModel,
+  Model,
+  PaginateOptions,
+  PipelineStage,
+  Types,
+} from 'mongoose';
 import { searchRegexp } from 'src/common/utils/search-regexp';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { FindAllRecordsResultDto } from './dto/find-all-records-result.dto';
@@ -47,8 +53,18 @@ export class RecordsService {
     params: FindRecordsQueryParams,
   ): Promise<FindAllRecordsResultDto> {
     // TODO: @casl/mongoose AccessibleRecords plugin
-    const { userLat, userLon, radius, search, author, ...paginateOptions } =
-      params;
+    const {
+      userLat,
+      userLon,
+      radius,
+      search,
+      author,
+      ...paramsPaginateOptions
+    } = params;
+    const paginateOptions: PaginateOptions = {
+      ...paramsPaginateOptions,
+      useFacet: false,
+    };
     const aggregation = [] as PipelineStage[];
     const closestMode = userLat != null && userLon != null;
     if (closestMode) {
