@@ -40,16 +40,17 @@ export class PhotosService {
   }
 
   async deleteOne(photoId: string): Promise<PhotoDocument> {
-    const photo = await this.findById(photoId);
+    const photo: PhotoDocument = await this.findById(photoId);
     if (!photo) {
       throw new NotFoundException('photo not found');
     }
 
-    const [, dbResult] = await Promise.all([
+    await Promise.all([
       this.cloudinaryService.deleteImage(photo.publicId),
       photo.deleteOne(),
     ]);
-    return dbResult;
+
+    return photo;
   }
 
   async deleteMany(ids: (string | Types.ObjectId)[]): Promise<{

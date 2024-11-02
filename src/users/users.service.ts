@@ -184,10 +184,12 @@ export class UsersService {
 
   async deleteById(id: string): Promise<User> {
     const user = await this.findById(id);
+
     if (!user) {
       throw new NotFoundException();
     }
-    return user.deleteOne({ fields: '-password' });
+    await user.deleteOne();
+    return { ...user.toObject(), password: undefined };
   }
 
   async setPassword(

@@ -163,6 +163,6 @@ export class RecordsService {
       this.photosService.deleteMany(record.photos),
       record.deleteOne(),
     ]);
-    return { record: recordResult, photos: photoResult };
+    return { record, photos: photoResult };
   }
 }
