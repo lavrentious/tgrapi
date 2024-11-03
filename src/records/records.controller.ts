@@ -22,7 +22,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Throttle, ThrottlerGuard, hours } from '@nestjs/throttler';
+import { Throttle, hours } from '@nestjs/throttler';
 import { Action, AppAbility } from 'src/ability/ability.factory';
 import { AbilityPipe } from 'src/ability/ability.pipe';
 import { SetAndCheckPolicies } from 'src/ability/decorators/set-and-check-policies.decorator';
@@ -62,7 +62,7 @@ export class RecordsController {
   @Post()
   @SetAndCheckPolicies(CreateRecordPolicyHandler)
   @Throttle({ default: { limit: 20, ttl: hours(1) } }) // 20 per 1 hour
-  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @UseGuards(JwtAuthGuard)
   async create(
     @Body() dto: CreateRecordDto,
     @RequestUser() currentUser: User,
