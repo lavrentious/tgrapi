@@ -115,8 +115,7 @@ export class RecordsController {
       record,
       'photos',
     );
-    const photoResult = await this.photosService.deleteOne(photoId);
-    return photoResult;
+    return await this.photosService.deleteOne(recordId, photoId);
   }
 
   @ApiOkResponse({ type: FindAllRecordsResultDto })

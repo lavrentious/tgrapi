@@ -150,7 +150,7 @@ export class RecordsService {
       const unusedPhotos = record.photos.filter(
         (id) => !newPhotos.has(id.toString()),
       );
-      await this.photosService.deleteMany(unusedPhotos);
+      await this.photosService.deleteMany(record._id.toString(), unusedPhotos);
     }
     if (dto.autoAddress) {
       const address = await this.geoService.addressByCoords(
@@ -175,10 +175,11 @@ export class RecordsService {
     record: RecordDocument;
     photos: { deleted: (void | Photo)[]; failed: string[] };
   }> {
-    const [photoResult, recordResult] = await Promise.all([
-      this.photosService.deleteMany(record.photos),
-      record.deleteOne(),
-    ]);
+    const photoResult = await this.photosService.deleteMany(
+      record._id.toString(),
+      record.photos,
+    );
+    await record.deleteOne();
     return { record, photos: photoResult };
   }
 }

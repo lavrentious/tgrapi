@@ -62,28 +62,49 @@ export class PhotosService {
     });
   }
 
-  async deleteOne(photoId: string): Promise<PhotoDocument> {
+  async deleteOne(recordId: string, photoId: string): Promise<PhotoDocument> {
     const photo: PhotoDocument = await this.findById(photoId);
     if (!photo) {
       throw new NotFoundException('photo not found');
     }
 
-    await Promise.all([
-      this.cloudinaryService.deleteImage(photo.publicId),
-      photo.deleteOne(),
-    ]);
+    let mutex = this.uploadLocks.get(recordId);
+    if (!mutex) {
+      mutex = new Mutex();
+      this.uploadLocks.set(recordId, mutex);
+    }
+
+    await mutex.runExclusive(async () => {
+      try {
+        const freshRecord = await this.recordsService.findById(recordId, false);
+        freshRecord.photos = freshRecord.photos.filter(
+          (id) => id.toString() !== photoId,
+        );
+        await freshRecord.save();
+        await Promise.all([
+          this.cloudinaryService.deleteImage(photo.publicId),
+          photo.deleteOne(),
+        ]);
+      } finally {
+        this.uploadLocks.delete(recordId);
+      }
+    });
 
     return photo;
   }
 
-  async deleteMany(ids: (string | Types.ObjectId)[]): Promise<{
+  async deleteMany(
+    recordId: string,
+    photoIds: (string | Types.ObjectId)[],
+  ): Promise<{
     deleted: (Photo | void)[];
     failed: string[];
   }> {
     const failed: string[] = [];
     const deleted = await Promise.all(
-      ids.map((id) =>
-        this.deleteOne(id.toString()).catch(() => {
+      photoIds.map((id) =>
+        this.deleteOne(recordId, id.toString()).catch((e) => {
+          console.warn('Failed to delete photo', id, e);
           failed.push(id.toString());
         }),
       ),
