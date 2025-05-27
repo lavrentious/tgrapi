@@ -6,7 +6,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { User } from 'src/users/schemas/user.schema';
 
-export const MAX_PHOTOS = 5;
+export const MAX_PHOTOS = 10;
 
 export type RecordDocument = HydratedDocument<Record>;
 
