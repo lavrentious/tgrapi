@@ -3,17 +3,17 @@
 <br />
 <div align="center">
   <a href="https://github.com/lavrentious/tgrapi">
-    <img src="https://tifloguide.ru/logo.png" alt="Logo" width="200" height="200" style="filter: drop-shadow(3px 3px 3px #aaa)">
+    <img src="https://tifloguide.lavrent.dog/logo.png" alt="Logo" width="200" height="200" style="filter: drop-shadow(3px 3px 3px #aaa)">
   </a>
 
-  <h3 align="center">tgrapi — Backend for <a href="https://tifloguide.ru">TifloGuide</a></h3>
+  <h3 align="center">tgrapi — Backend for <a href="https://tifloguide.lavrent.dog">TifloGuide</a></h3>
 
   <p align="center">
     Серверная часть веб-приложения <strong>TifloGuide</strong> 
     <br />
-    <a href="https://tgrapi.tifloguide.ru/docs"><strong>API документация »</strong></a>
+    <a href="https://api.tifloguide.lavrent.dog/docs"><strong>API документация »</strong></a>
     <br/ >
-    <a href="https://tgrapi.tifloguide.ru"><strong>Деплой »</strong></a>
+    <a href="https://api.tifloguide.lavrent.dog"><strong>Деплой »</strong></a>
   </p>
 </div>
 
@@ -122,7 +122,7 @@
 
 ## Контакты
 
-Автор — **lavrent** — <a href="https://lavrentious.ru">lavrentious.ru</a>
+Автор — **lavrent** — <a href="https://lavrent.dog">lavrent.dog</a>
 
 Репозиторий: [https://github.com/lavrentious/tgrapi](https://github.com/lavrentious/tgrapi)
 
